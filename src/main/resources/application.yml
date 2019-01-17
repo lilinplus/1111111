@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active: dev
+#远程调试工具配置
+  devtools:
+    remote:
+#      secret: hisuap
+      secret: mysecret
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  application:
+    name: ITSERVICE2.0
+jasypt:
+  encryptor:
+    password: EbfYkitulv73I2p0mXI50JMXoaxZTKJ7
+    algorithm: PBEWithMD5AndDES

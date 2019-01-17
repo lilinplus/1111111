@@ -1,0 +1,75 @@
+server:
+  port: 8120
+---
+# 开发环境配置
+spring:
+  profiles: dev
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://172.16.207.133:8006/it_service?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
+    username: ENC(xeAC+RVzAn1GXbFJcKx9jg==)
+    password: ENC(bL0FVE8BxwTuuFgubJSgqw==)
+    driver-class-name: com.mysql.jdbc.Driver
+# 下面为连接池的补充设置，应用到上面所有数据源中
+# 初始化大小，最小，最大
+    initial-size: 5
+    min-idle: 5
+    max-active: 20
+# 配置获取连接等待超时的时间
+    max-wait: 60000
+# 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    time-between-eviction-runs-millis: 60000
+# 配置一个连接在池中最小生存的时间，单位是毫秒
+    min-evictable-idle-time-millis: 300000
+    validation-query: SELECT 1 FROM DUAL
+    test-while-idle: true
+    test-on-borrow: false
+    test-on-return: false
+# 打开PSCache，并且指定每个连接上PSCache的大小
+    pool-prepared-statements: true
+    max-pool-prepared-statement-per-connection-size: 20
+# 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    filters: stat,wall,log4j
+    log-show-sql: true
+    connection-properties:
+      druid:
+        stat:
+          merge-sql: true
+          slow-sql-millis: 5000
+    use-global-datasource-stat: true
+  jpa:
+    database: MYSQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+#        dialect: org.hibernate.dialect.MySQL5Dialect
+#    database-platform: org.hibernate.dialect.MySQL5Dialect
+#设置数据库表engine为innodb格式
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    generate-ddl: true
+  mvc:
+    static-path-pattern: /**
+  resources:
+    static-locations: file:///D:/dist/itservice/admin/dist
+#指定日志配置文件，如不指定则按照 log4j2-test log4j2的顺序加载
+logging:
+  config: classpath:log4j2.xml
+#cas相关配置
+cas:
+  casServerUrlPrefix: https://itebeta.baidu.com
+  casServerLoginUrl: https://itebeta.baidu.com/login
+  serverName: http://localhost:8120
+  encoding: UTF-8
+  urlPatterns: /*
+web:
+  uuap-host: itebeta.baidu.com/logout
+  uuap-ip: localhost:8120/
+#调用启动的uic配置
+xml:
+  config:
+    classpath: test
