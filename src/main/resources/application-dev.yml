@@ -1,14 +1,14 @@
 server:
-  port: 8120
+  port: 8121
 ---
 # 开发环境配置
 spring:
   profiles: dev
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://172.16.207.133:8006/it_service?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
-    username: ENC(xeAC+RVzAn1GXbFJcKx9jg==)
-    password: ENC(bL0FVE8BxwTuuFgubJSgqw==)
+    url: jdbc:mysql://localhost:3306/call?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
+    username: root
+    password: 123456
     driver-class-name: com.mysql.jdbc.Driver
 # 下面为连接池的补充设置，应用到上面所有数据源中
 # 初始化大小，最小，最大
@@ -63,12 +63,12 @@ logging:
 cas:
   casServerUrlPrefix: https://itebeta.baidu.com
   casServerLoginUrl: https://itebeta.baidu.com/login
-  serverName: http://localhost:8120
+  serverName: http://localhost:8121
   encoding: UTF-8
   urlPatterns: /*
 web:
   uuap-host: itebeta.baidu.com/logout
-  uuap-ip: localhost:8120/
+  uuap-ip: localhost:8121/
 #调用启动的uic配置
 xml:
   config:
