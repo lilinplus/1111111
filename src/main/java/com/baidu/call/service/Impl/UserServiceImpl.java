@@ -2,10 +2,10 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.call.model.Area;
-import com.baidu.call.repository.AreaRepository;
-import com.baidu.call.service.AreaService;
+import com.baidu.call.model.User;
+import com.baidu.call.repository.UserRepository;
 import com.baidu.call.service.CommonService;
+import com.baidu.call.service.UserService;
 import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.ValidatorUtil;
 import com.baidu.call.utils.page.dtgrid.Pager;
@@ -13,38 +13,43 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.*;
+
 import static com.baidu.call.utils.PropertyFieldConvertor.propertyToField;
 
 @Service
-public class AreaServiceImpl implements AreaService {
+public class UserServiceImpl implements UserService {
 
-    private Logger logger = LogManager.getLogger(AreaServiceImpl.class);
+    private Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     @Autowired
     private CommonService commonService;
 
     @Autowired
-    private AreaRepository areaRepository;
+    private UserRepository userRepository;
 
-    //添加区域
+    //添加用户
     @Override
-    public Msg addArea(Area area) {
+    public Msg addUser(User user) {
         Msg msg = new Msg(false, "添加失败");
         try {
-            if(area.getAreaName()!=null && !"".equals(area.getAreaName())){
-                Area area1=areaRepository.findByAreaName(area.getAreaName());
-                if(area1==null){
-                    area.setAreaCreatetime(new Date().getTime());
-                    areaRepository.save(area);
-                    msg.setSuccess(true);
-                    msg.setMsg("添加成功");
+            if(user.getUserName()!=null && !"".equals(user.getUserName()) && user.getUserRole()!=null && !"".equals(user.getUserRole())){
+                if(user.getUserAreaId()!=null && !"".equals(user.getUserAreaId())){
+                    User user1=userRepository.findByUserName(user.getUserName());
+                    if(user1==null){
+                        userRepository.save(user);
+                        msg.setSuccess(true);
+                        msg.setMsg("添加成功");
+                    }else {
+                        msg.setMsg("用户名已存在");
+                        return msg;
+                    }
                 }else {
-                    msg.setMsg("区域名已存在");
-                    return msg;
+                    msg.setMsg("区域不能为空");
                 }
             }else {
-                msg.setMsg("区域名不能为空");
+                msg.setMsg("用户名和角色不能为空");
                 return msg;
             }
         }catch (Exception e){
@@ -53,17 +58,17 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    //删除区域
+    //删除用户
     @Override
-    public Msg deleteArea(Long areaId) {
+    public Msg deleteUser(Long userId) {
         Msg msg = new Msg(false, "删除失败");
         try {
-            Area area=areaRepository.findByAreaId(areaId);
-            if(area==null){
-                msg.setMsg("信息不存在");
+            User user=userRepository.findByUserId(userId);
+            if(user==null){
+                msg.setMsg("用户不存在");
                 return msg;
             }
-            areaRepository.deleteById(areaId);
+            userRepository.deleteById(userId);
             msg.setSuccess(true);
             msg.setMsg("删除成功");
         }catch (Exception e){
@@ -72,35 +77,39 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    //修改区域信息
+    //修改用户
     @Override
-    public Msg updateArea(Long areaId, Area area) {
+    public Msg updateUser(Long userId, User user) {
         Msg msg = new Msg(false, "修改失败");
         try {
-            List list = ValidatorUtil.validateList(area);
+            List list = ValidatorUtil.validateList(user);
             if(list != null && list.size() > 0){
                 msg.setMsg(list.get(0).toString());
                 return msg;
             }
-            if(!areaId.toString().equals(areaRepository.findByAreaId(areaId).getAreaId().toString())){
+            if(!userId.toString().equals(userRepository.findByUserId(userId).getUserId().toString())){
                 msg.setMsg("信息错误，请检查更新的信息");
                 return msg;
             }
-            if(areaRepository.findByAreaId(areaId)==null){
+            if(userRepository.findByUserId(userId)==null){
                 msg.setMsg("信息不存在");
                 return msg;
             }
-            if(area.getAreaName()!=null && !"".equals(area.getAreaName())){
-                Area area1=areaRepository.findByAreaName(area.getAreaName());
-                if(area1==null || area1.getAreaId()==areaId){
-                    areaRepository.save(area);
-                    msg.setSuccess(true);
-                    msg.setMsg("修改成功");
+            if(user.getUserName()!=null && !"".equals(user.getUserName()) && user.getUserRole()!=null && !"".equals(user.getUserRole())){
+                if(user.getUserAreaId()!=null && !"".equals(user.getUserAreaId())){
+                    User user1=userRepository.findByUserName(user.getUserName());
+                    if(user1==null || user1.getUserId()==userId){
+                        userRepository.save(user);
+                        msg.setSuccess(true);
+                        msg.setMsg("修改成功");
+                    }else {
+                        msg.setMsg("域用户已存在");
+                    }
                 }else {
-                    msg.setMsg("区域名已存在");
+                    msg.setMsg("区域不能为空");
                 }
             }else {
-                msg.setMsg("区域名不能为空");
+                msg.setMsg("域用户和角色不能为空");
             }
         }catch (Exception e){
             msg.setMsg("修改失败"+e);
@@ -108,15 +117,15 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    //查询区域信息
+    //查询用户
     @Override
-    public Pager queryArea(Pager pager) {
+    public Pager queryUser(Pager pager) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
         Map<String,Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String sql = "select * from call_area";
+            String sql = "select * from call_user";
             if(parameters != null ){
                 Set<String> set=parameters.keySet();
                 for(String key:set)
@@ -141,10 +150,10 @@ public class AreaServiceImpl implements AreaService {
             if (retVal.size() > 0) {
                 for (int j = 0; j < retVal.size(); j++) {
                     Map map = new HashMap();
-                    map.put("areaId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_id"));
-                    map.put("areaName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_name"));
-                    map.put("areaCreatetime",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_createtime"));
-                    map.put("areaRemarks",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_remarks"));
+                    map.put("userId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_id"));
+                    map.put("userAreaId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_area_id"));
+                    map.put("userName",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_name"));
+                    map.put("userRole",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_role"));
                     listMap.add(map);
                 }
             }
