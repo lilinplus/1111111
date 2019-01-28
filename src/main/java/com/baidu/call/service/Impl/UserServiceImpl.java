@@ -2,17 +2,22 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.call.model.Area;
 import com.baidu.call.model.User;
+import com.baidu.call.model.UserArea;
+import com.baidu.call.pojo.UserAreaVo;
+import com.baidu.call.repository.AreaRepository;
+import com.baidu.call.repository.UserAreaRepository;
 import com.baidu.call.repository.UserRepository;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.UserService;
 import com.baidu.call.utils.Msg;
-import com.baidu.call.utils.ValidatorUtil;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -29,24 +34,54 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AreaRepository areaRepository;
+
+    @Autowired
+    private UserAreaRepository userAreaRepository;
+
     //添加用户
     @Override
-    public Msg addUser(User user) {
+    @Transactional(rollbackFor = Exception.class)
+    public Msg addUser(UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "添加失败");
         try {
-            if(user.getUserName()!=null && !"".equals(user.getUserName()) && user.getUserRole()!=null && !"".equals(user.getUserRole())){
-                if(user.getUserAreaId()!=null && !"".equals(user.getUserAreaId())){
-                    User user1=userRepository.findByUserName(user.getUserName());
-                    if(user1==null){
-                        userRepository.save(user);
-                        msg.setSuccess(true);
-                        msg.setMsg("添加成功");
+            String userName=userAreaVo.getUser().getUserName();//域用户
+            String role=userAreaVo.getUser().getUserRole();//角色名
+            Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
+            if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
+                if(areaId!=null && !"".equals(areaId)){
+                    if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
+                        User user1=userRepository.findByUserName(userName);
+                        Long[] areaId2=userAreaVo.getAreaId();
+                        if(user1==null){
+                            User user=new User();
+                            user.setUserAreaId(areaId);
+                            user.setUserName(userName);
+                            user.setUserRole(role);
+                            userRepository.save(user);
+                            for(int i=0;i<areaId2.length;i++){
+                                Area area=areaRepository.findByAreaId(areaId2[i]);
+                                if(area!=null){
+                                    UserArea userArea=new UserArea();
+                                    userArea.setAreaId(areaId2[i]);
+                                    userArea.setUserName(userName);
+                                    userAreaRepository.save(userArea);
+                                }else {
+                                    msg.setMsg("所选区域不存在");
+                                }
+                            }
+                            msg.setSuccess(true);
+                            msg.setMsg("添加成功");
+                        }else {
+                            msg.setMsg("域用户已存在");
+                            return msg;
+                        }
                     }else {
-                        msg.setMsg("用户名已存在");
-                        return msg;
+                        msg.setMsg("负责区域不能为空");
                     }
                 }else {
-                    msg.setMsg("区域不能为空");
+                    msg.setMsg("所在区域不能为空");
                 }
             }else {
                 msg.setMsg("用户名和角色不能为空");
@@ -60,6 +95,7 @@ public class UserServiceImpl implements UserService {
 
     //删除用户
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Msg deleteUser(Long userId) {
         Msg msg = new Msg(false, "删除失败");
         try {
@@ -67,6 +103,10 @@ public class UserServiceImpl implements UserService {
             if(user==null){
                 msg.setMsg("用户不存在");
                 return msg;
+            }
+            String userName=user.getUserName();
+            if(userName!=null){
+                userAreaRepository.deleteByUserName(userName);
             }
             userRepository.deleteById(userId);
             msg.setSuccess(true);
@@ -79,34 +119,42 @@ public class UserServiceImpl implements UserService {
 
     //修改用户
     @Override
-    public Msg updateUser(Long userId, User user) {
+    @Transactional(rollbackFor = Exception.class)
+    public Msg updateUser(Long userId,UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "修改失败");
         try {
-            List list = ValidatorUtil.validateList(user);
-            if(list != null && list.size() > 0){
-                msg.setMsg(list.get(0).toString());
-                return msg;
-            }
-            if(!userId.toString().equals(userRepository.findByUserId(userId).getUserId().toString())){
-                msg.setMsg("信息错误，请检查更新的信息");
-                return msg;
-            }
-            if(userRepository.findByUserId(userId)==null){
-                msg.setMsg("信息不存在");
-                return msg;
-            }
-            if(user.getUserName()!=null && !"".equals(user.getUserName()) && user.getUserRole()!=null && !"".equals(user.getUserRole())){
-                if(user.getUserAreaId()!=null && !"".equals(user.getUserAreaId())){
-                    User user1=userRepository.findByUserName(user.getUserName());
+            String userName=userAreaVo.getUser().getUserName();//域用户
+            String role=userAreaVo.getUser().getUserRole();//角色名
+            Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
+            if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
+                if(areaId!=null && !"".equals(areaId)){
+                    User user1=userRepository.findByUserName(userName);
                     if(user1==null || user1.getUserId()==userId){
+                        User user=userAreaVo.getUser();
                         userRepository.save(user);
+                        List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
+                        if(userAreaList.size()>0){
+                            userAreaRepository.deleteByUserName(userName);
+                        }
+                        Long[] areaId2=userAreaVo.getAreaId();//负责区域id
+                        for(int i=0;i<areaId2.length;i++){
+                            Area area=areaRepository.findByAreaId(areaId2[i]);
+                            if(area!=null){
+                                UserArea userArea=new UserArea();
+                                userArea.setAreaId(areaId2[i]);
+                                userArea.setUserName(userName);
+                                userAreaRepository.save(userArea);
+                            }else {
+                                msg.setMsg("负责区域不存在");
+                            }
+                        }
                         msg.setSuccess(true);
                         msg.setMsg("修改成功");
                     }else {
                         msg.setMsg("域用户已存在");
                     }
                 }else {
-                    msg.setMsg("区域不能为空");
+                    msg.setMsg("所属区域不能为空");
                 }
             }else {
                 msg.setMsg("域用户和角色不能为空");

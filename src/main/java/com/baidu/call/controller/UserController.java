@@ -1,6 +1,6 @@
 package com.baidu.call.controller;
 
-import com.baidu.call.model.User;
+import com.baidu.call.pojo.UserAreaVo;
 import com.baidu.call.service.UserService;
 import com.baidu.call.utils.JsonUtils;
 import com.baidu.call.utils.page.dtgrid.Pager;
@@ -25,14 +25,14 @@ public class UserController {
 
     /**
      * 添加用户
-     * @param user
+     * @param userAreaVo
      * @param response
      */
     @ApiOperation(value = "添加用户", notes = "添加用户")
-    @ApiImplicitParam(value = "user", name = "user", dataType = "User")
+    @ApiImplicitParam(value = "userAreaVo", name = "userAreaVo", dataType = "UserAreaVo")
     @RequestMapping(value = "/call/adduser", method = RequestMethod.POST)
-    public void addUser(User user, HttpServletResponse response) {
-        JsonUtils.writeJsonBySerializer(userService.addUser(user), response);
+    public void addUser(UserAreaVo userAreaVo, HttpServletResponse response) {
+        JsonUtils.writeJsonBySerializer(userService.addUser(userAreaVo), response);
     }
 
     /**
@@ -50,17 +50,17 @@ public class UserController {
     /**
      * 修改用户信息
      * @param userId
-     * @param user
+     * @param userAreaVo
      * @param response
      */
     @ApiOperation(value = "修改用户", notes = "修改用户")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "userId", name = "userId", dataType = "Long",paramType = "path"),
-            @ApiImplicitParam(value = "user", name = "user", dataType = "User")
+            @ApiImplicitParam(value = "userAreaVo", name = "userAreaVo", dataType = "UserAreaVo")
     })
     @RequestMapping(value = "/call/updateuser{userId}", method = RequestMethod.PUT)
-    public void updateUser(@PathVariable Long userId, User user, HttpServletResponse response){
-        JsonUtils.writeJsonBySerializer(userService.updateUser(userId,user),response);
+    public void updateUser(@PathVariable Long userId, UserAreaVo userAreaVo, HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(userService.updateUser(userId,userAreaVo),response);
     }
 
     /**
