@@ -173,7 +173,9 @@ public class UserServiceImpl implements UserService {
         Map<String,Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String sql = "select * from call_user";
+            String sql = "select cu.user_id as userId,ca.area_name as areaName," +
+                    "cu.user_name as userName,cu.user_role as userRole from call_user cu " +
+                    "left join call_area ca on cu.user_area_id=ca.area_id where 1=1";
             if(parameters != null ){
                 Set<String> set=parameters.keySet();
                 for(String key:set)
@@ -198,10 +200,33 @@ public class UserServiceImpl implements UserService {
             if (retVal.size() > 0) {
                 for (int j = 0; j < retVal.size(); j++) {
                     Map map = new HashMap();
-                    map.put("userId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_id"));
-                    map.put("userAreaId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_area_id"));
-                    map.put("userName",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_name"));
-                    map.put("userRole",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("user_role"));
+                    String userName = JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userName").toString();
+                    map.put("userId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userId"));
+                    map.put("userAreaName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("areaName"));
+                    map.put("userName",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userName"));
+                    map.put("userRole",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userRole"));
+                    List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
+                    if (userAreaList != null) {
+                        String strAreaId[] = new String[userAreaList.size()];
+                        List<Area> areaList = new ArrayList<Area>();
+                        for (int p = 0; p < userAreaList.size(); p++) {
+                            Long riAreaId = userAreaList.get(p).getAreaId();
+                            Area area = areaRepository.findByAreaId(riAreaId);
+                            areaList.add(area);
+                            strAreaId[p] = area.getAreaName();
+                        }
+                        StringBuffer permission = new StringBuffer();
+                        if (strAreaId.length > 0) {
+                            for (int m = 0; m < strAreaId.length; m++) {
+                                if (m == 0) {
+                                    permission.append(strAreaId[0].toString());
+                                } else {
+                                    permission.append("," + strAreaId[m].toString());
+                                }
+                            }
+                        }
+                        map.put("areaName", permission);
+                    }
                     listMap.add(map);
                 }
             }
