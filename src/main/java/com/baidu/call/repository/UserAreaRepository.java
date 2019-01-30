@@ -11,4 +11,6 @@ public interface UserAreaRepository extends CrudRepository<UserArea,Long> {
 
     List<UserArea> findByUserName(String userName);
 
+    List<UserArea> findByAreaId(Long areaId);
+
 }

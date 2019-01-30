@@ -2,12 +2,10 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.call.model.Area;
-import com.baidu.call.model.UserArea;
-import com.baidu.call.repository.AreaRepository;
-import com.baidu.call.repository.UserAreaRepository;
-import com.baidu.call.service.AreaService;
+import com.baidu.call.model.Phone;
+import com.baidu.call.repository.PhoneRepository;
 import com.baidu.call.service.CommonService;
+import com.baidu.call.service.PhoneService;
 import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.ValidatorUtil;
 import com.baidu.call.utils.page.dtgrid.Pager;
@@ -21,7 +19,7 @@ import java.util.*;
 import static com.baidu.call.utils.PropertyFieldConvertor.propertyToField;
 
 @Service
-public class AreaServiceImpl implements AreaService {
+public class PhoneServiceImpl implements PhoneService {
 
     private Logger logger = LogManager.getLogger(AreaServiceImpl.class);
 
@@ -29,30 +27,24 @@ public class AreaServiceImpl implements AreaService {
     private CommonService commonService;
 
     @Autowired
-    private AreaRepository areaRepository;
+    private PhoneRepository phoneRepository;
 
-    @Autowired
-    private UserAreaRepository userAreaRepository;
-
-    //添加区域
     @Override
-    public Msg addArea(Area area) {
+    public Msg addPhone(Phone phone) {
         Msg msg = new Msg(false, "添加失败");
         try {
-            if(area.getAreaName()!=null && !"".equals(area.getAreaName())){
-                Area area1=areaRepository.findByAreaName(area.getAreaName());
-                if(area1==null){
-                    area.setAreaCreatetime(new Date().getTime());
-                    areaRepository.save(area);
+            String phoneName=phone.getPhoneName();
+            if(phoneName!=null && !"".equals(phoneName)){
+                Phone phone1=phoneRepository.findByPhoneName(phoneName);
+                if(phone1==null){
+                    phoneRepository.save(phone);
                     msg.setSuccess(true);
                     msg.setMsg("添加成功");
                 }else {
-                    msg.setMsg("区域名已存在");
-                    return msg;
+                    msg.setMsg("话机号已存在");
                 }
             }else {
-                msg.setMsg("区域名不能为空");
-                return msg;
+                msg.setMsg("话机号不能为空");
             }
         }catch (Exception e){
             msg.setMsg("添加失败"+e);
@@ -60,22 +52,16 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    //删除区域
     @Override
-    public Msg deleteArea(Long areaId) {
+    public Msg deletePhone(Long phoneId) {
         Msg msg = new Msg(false, "删除失败");
         try {
-            Area area=areaRepository.findByAreaId(areaId);
-            if(area==null){
+            Phone phone=phoneRepository.findByPhoneId(phoneId);
+            if(phone==null){
                 msg.setMsg("信息不存在");
                 return msg;
             }
-            List<UserArea> userAreaList=userAreaRepository.findByAreaId(areaId);
-            if(userAreaList.size()>0){
-                msg.setMsg("此区域有引用，不能删除");
-                return msg;
-            }
-            areaRepository.deleteById(areaId);
+            phoneRepository.deleteById(phoneId);
             msg.setSuccess(true);
             msg.setMsg("删除成功");
         }catch (Exception e){
@@ -84,51 +70,46 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    //修改区域信息
     @Override
-    public Msg updateArea(Long areaId, Area area) {
+    public Msg updatePhone(Long phoneId, Phone phone) {
         Msg msg = new Msg(false, "修改失败");
-        try {
-            List list = ValidatorUtil.validateList(area);
-            if(list != null && list.size() > 0){
-                msg.setMsg(list.get(0).toString());
-                return msg;
-            }
-            if(!areaId.toString().equals(areaRepository.findByAreaId(areaId).getAreaId().toString())){
-                msg.setMsg("信息错误，请检查更新的信息");
-                return msg;
-            }
-            if(areaRepository.findByAreaId(areaId)==null){
-                msg.setMsg("信息不存在");
-                return msg;
-            }
-            if(area.getAreaName()!=null && !"".equals(area.getAreaName())){
-                Area area1=areaRepository.findByAreaName(area.getAreaName());
-                if(area1==null || area1.getAreaId()==areaId){
-                    areaRepository.save(area);
-                    msg.setSuccess(true);
-                    msg.setMsg("修改成功");
-                }else {
-                    msg.setMsg("区域名已存在");
-                }
+        List list = ValidatorUtil.validateList(phone);
+        if(list != null && list.size() > 0){
+            msg.setMsg(list.get(0).toString());
+            return msg;
+        }
+        if(!phoneId.toString().equals(phoneRepository.findByPhoneId(phoneId).getPhoneId().toString())){
+            msg.setMsg("信息错误，请检查更新的信息");
+            return msg;
+        }
+        if(phoneRepository.findByPhoneId(phoneId)==null){
+            msg.setMsg("信息不存在");
+            return msg;
+        }
+        String phoneName=phone.getPhoneName();
+        if(phoneName!=null && !"".equals(phoneName)){
+            Phone phone1=phoneRepository.findByPhoneName(phoneName);
+            if(phone1==null || phone1.getPhoneId()==phoneId){
+                phoneRepository.save(phone);
+                msg.setSuccess(true);
+                msg.setMsg("修改成功");
             }else {
-                msg.setMsg("区域名不能为空");
+                msg.setMsg("话机号已存在");
             }
-        }catch (Exception e){
-            msg.setMsg("修改失败"+e);
+        }else {
+            msg.setMsg("话机号不能为空");
         }
         return msg;
     }
 
-    //查询区域信息
     @Override
-    public Pager queryArea(Pager pager) {
+    public Pager queryPhone(Pager pager) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
         Map<String,Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String sql = "select * from call_area where 1=1";
+            String sql = "select * from call_phone where 1=1";
             if(parameters != null ){
                 Set<String> set=parameters.keySet();
                 for(String key:set)
@@ -153,10 +134,8 @@ public class AreaServiceImpl implements AreaService {
             if (retVal.size() > 0) {
                 for (int j = 0; j < retVal.size(); j++) {
                     Map map = new HashMap();
-                    map.put("areaId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_id"));
-                    map.put("areaName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_name"));
-                    map.put("areaCreatetime",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_createtime"));
-                    map.put("areaRemarks",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_remarks"));
+                    map.put("phoneId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("phone_id"));
+                    map.put("phoneName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("phone_name"));
                     listMap.add(map);
                 }
             }
@@ -198,4 +177,5 @@ public class AreaServiceImpl implements AreaService {
         map.put("page", pageNum);
         return map;
     }
+
 }
