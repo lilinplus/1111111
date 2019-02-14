@@ -14,4 +14,6 @@ public interface GroupService {
 
     Pager queryGroup(Pager pager);
 
+    Msg queryGroupMemberName(Long groupId);
+
 }

@@ -35,11 +35,11 @@ public class GroupController {
     }
 
     /**
-     * 删除分组信息
+     * 解除分组
      * @param groupId
      * @param response
      */
-    @ApiOperation(value = "删除分组", notes = "删除分组")
+    @ApiOperation(value = "解除分组", notes = "解除分组")
     @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
     @RequestMapping(value = "/call/deletegroup{groupId}", method = RequestMethod.DELETE)
     public void deleteGroupId(@PathVariable Long groupId, HttpServletResponse response){
@@ -72,6 +72,18 @@ public class GroupController {
     @RequestMapping(value = "/call/selectgroup", method = RequestMethod.GET)
     public void queryGroup(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.queryGroup(pager),response);
+    }
+
+    /**
+     * 根据分组id查询该分组下成员域用户
+     * @param groupId
+     * @param response
+     */
+    @ApiOperation(value = "查询该分组下成员域用户",notes = "查询该分组下成员域用户")
+    @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/queryGroupMemberName{groupId}",method = RequestMethod.GET)
+    public void queryGroupMemberName(@PathVariable Long groupId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(groupService.queryGroupMemberName(groupId),response);
     }
 
 }

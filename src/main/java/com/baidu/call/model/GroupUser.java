@@ -16,7 +16,7 @@ public class GroupUser {
     private Long groupUserId;//id
 
     @Column(name = "group_id")
-    private Long GroupId;//分组id
+    private Long groupId;//分组id
 
     @Column(name = "user_name")
     @Size(max = 50,message = "长度不得超过50")
