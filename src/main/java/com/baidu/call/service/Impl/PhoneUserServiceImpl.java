@@ -2,23 +2,27 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.call.model.Member;
-import com.baidu.call.repository.MemberRepository;
+import com.baidu.call.model.PhoneUser;
+import com.baidu.call.repository.PhoneUserRepository;
 import com.baidu.call.service.CommonService;
-import com.baidu.call.service.MemberService;
+import com.baidu.call.service.PhoneUserService;
 import com.baidu.call.utils.Msg;
+import com.baidu.call.utils.ValidatorUtil;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.baidu.call.utils.PropertyFieldConvertor.propertyToField;
 
 @Service
-public class MemberServiceImpl implements MemberService {
+public class PhoneUserServiceImpl implements PhoneUserService {
 
     private Logger logger = LogManager.getLogger(AreaServiceImpl.class);
 
@@ -26,35 +30,23 @@ public class MemberServiceImpl implements MemberService {
     private CommonService commonService;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private PhoneUserRepository phoneUserRepository;
 
-    //为分组添加成员
+    //添加用户使用话机的时间段
     @Override
-    public Msg addMember(Member member) {
+    public Msg addPhoneUser(PhoneUser phoneUser) {
         Msg msg = new Msg(false,"添加失败");
         try {
-            Long memberGroupId=member.getMemberGroupId();
-            String memberName=member.getMemberName();
-            if(memberGroupId!=null && !"".equals(memberGroupId)){
-                if(memberName!=null && !"".equals(memberName)){
-                    List<Member> memberList=memberRepository.findByMemberGroupId(memberGroupId);
-                    for(int i=0;i<memberList.size();i++){
-                        String memberName1=memberList.get(i).getMemberName();
-                        if(memberName1.equals(memberName)){
-                            msg.setMsg("域用户在该分组中已存在");
-                            return msg;
-                        }
-                    }
-                    memberRepository.save(member);
-                    msg.setSuccess(true);
-                    msg.setMsg("添加成功");
-                }else {
-                    msg.setMsg("成员域用户不能为空");
-                    return msg;
-                }
+            String userName=phoneUser.getUserName();
+            Long phoneNumId=phoneUser.getPhoneNumId();
+            Long phoneStarttime=phoneUser.getPhoneStarttime();
+            Long phoneEndtime=phoneUser.getPhoneEndtime();
+            if(userName!=null && !"".equals(userName) && phoneNumId!=null && !"".equals(phoneNumId) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
+                phoneUserRepository.save(phoneUser);
+                msg.setSuccess(true);
+                msg.setMsg("添加成功");
             }else {
-                msg.setMsg("分组不能为空");
-                return msg;
+                msg.setMsg("文本框不能为空");
             }
         }catch (Exception e){
             msg.setMsg("添加失败"+e);
@@ -62,17 +54,16 @@ public class MemberServiceImpl implements MemberService {
         return msg;
     }
 
-    //删除分组成员
     @Override
-    public Msg deleteMember(Long memberId) {
+    public Msg deletePhoneUser(Long phoneUserId) {
         Msg msg = new Msg(false,"删除失败");
         try {
-            Member member=memberRepository.findByMemberId(memberId);
-            if(member==null){
+            PhoneUser phoneUser=phoneUserRepository.findByPhoneUserId(phoneUserId);
+            if(phoneUser==null){
                 msg.setMsg("信息不存在");
                 return msg;
             }
-            memberRepository.deleteById(memberId);
+            phoneUserRepository.deleteById(phoneUserId);
             msg.setSuccess(true);
             msg.setMsg("删除成功");
         }catch (Exception e){
@@ -81,25 +72,48 @@ public class MemberServiceImpl implements MemberService {
         return msg;
     }
 
-//    @Override
-//    public Msg updateMember(Long memberId, Member member) {
-//        Msg msg = new Msg(false,"更新成功");
-//        try {
-//
-//        }catch (Exception e){
-//            msg.setMsg("更新失败"+e);
-//        }
-//        return null;
-//    }
+    @Override
+    public Msg updatePhoneUser(Long phoneUserId, PhoneUser phoneUser) {
+        Msg msg = new Msg(false,"更新失败");
+        List list = ValidatorUtil.validateList(phoneUser);
+        if(list != null && list.size() > 0){
+            msg.setMsg(list.get(0).toString());
+            return msg;
+        }
+        if(!phoneUserId.toString().equals(phoneUserRepository.findByPhoneUserId(phoneUserId).getPhoneUserId().toString())){
+            msg.setMsg("信息错误，请检查更新的信息");
+            return msg;
+        }
+        if(phoneUserRepository.findByPhoneUserId(phoneUserId)==null){
+            msg.setMsg("信息不存在");
+            return msg;
+        }
+        String userName=phoneUser.getUserName();
+        Long phoneNumId=phoneUser.getPhoneNumId();
+        Long phoneStarttime=phoneUser.getPhoneStarttime();
+        Long phoneEndtime=phoneUser.getPhoneEndtime();
+        if(userName!=null && !"".equals(userName) && phoneNumId!=null && !"".equals(phoneNumId) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
+            phoneUserRepository.save(phoneUser);
+            msg.setSuccess(true);
+            msg.setMsg("更新成功");
+        }else {
+            msg.setMsg("文本框不能为空");
+        }
+        return msg;
+    }
 
     @Override
-    public Pager queryMember(Pager pager) {
+    public Pager queryPhoneUser(Pager pager) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
         Map<String,Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String sql = "select cm.member_id memberId,cg.group_name groupName,cm.member_name memberName from call_member cm inner join call_group cg on cm.member_group_id=cg.group_id where 1=1";
+            String sql = "SELECT cpu.phone_user_id phoneUserId,cu.user_name userName," +
+                    "cp.phone_name phoneName,cpu.phone_starttime phoneStarttime," +
+                    "cpu.phone_endtime phoneEndtime FROM call_phone_user cpu INNER JOIN " +
+                    "call_phone cp ON cpu.phone_num_id=cp.phone_id INNER JOIN call_user cu ON " +
+                    "cpu.user_name=cu.user_name WHERE 1=1";
             if(parameters != null ){
                 Set<String> set=parameters.keySet();
                 for(String key:set)

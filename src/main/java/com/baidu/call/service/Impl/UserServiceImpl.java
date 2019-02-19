@@ -2,13 +2,9 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baidu.call.model.Area;
-import com.baidu.call.model.User;
-import com.baidu.call.model.UserArea;
+import com.baidu.call.model.*;
 import com.baidu.call.pojo.UserAreaVo;
-import com.baidu.call.repository.AreaRepository;
-import com.baidu.call.repository.UserAreaRepository;
-import com.baidu.call.repository.UserRepository;
+import com.baidu.call.repository.*;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.UserService;
 import com.baidu.call.utils.Msg;
@@ -40,6 +36,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserAreaRepository userAreaRepository;
 
+    @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
+    private GroupUserRepository groupUserRepository;
+
     //添加用户
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -51,26 +53,14 @@ public class UserServiceImpl implements UserService {
             Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
             if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
                 if(areaId!=null && !"".equals(areaId)){
-                    if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
+                    if("普通用户".equals(userAreaVo.getUser().getUserRole())){
                         User user1=userRepository.findByUserName(userName);
-                        Long[] areaId2=userAreaVo.getAreaId();
                         if(user1==null){
                             User user=new User();
                             user.setUserAreaId(areaId);
                             user.setUserName(userName);
                             user.setUserRole(role);
                             userRepository.save(user);
-                            for(int i=0;i<areaId2.length;i++){
-                                Area area=areaRepository.findByAreaId(areaId2[i]);
-                                if(area!=null){
-                                    UserArea userArea=new UserArea();
-                                    userArea.setAreaId(areaId2[i]);
-                                    userArea.setUserName(userName);
-                                    userAreaRepository.save(userArea);
-                                }else {
-                                    msg.setMsg("所选区域不存在");
-                                }
-                            }
                             msg.setSuccess(true);
                             msg.setMsg("添加成功");
                         }else {
@@ -78,7 +68,35 @@ public class UserServiceImpl implements UserService {
                             return msg;
                         }
                     }else {
-                        msg.setMsg("负责区域不能为空");
+                        if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
+                            User user1=userRepository.findByUserName(userName);
+                            Long[] areaId2=userAreaVo.getAreaId();
+                            if(user1==null){
+                                User user=new User();
+                                user.setUserAreaId(areaId);
+                                user.setUserName(userName);
+                                user.setUserRole(role);
+                                userRepository.save(user);
+                                for(int i=0;i<areaId2.length;i++){
+                                    Area area=areaRepository.findByAreaId(areaId2[i]);
+                                    if(area!=null){
+                                        UserArea userArea=new UserArea();
+                                        userArea.setAreaId(areaId2[i]);
+                                        userArea.setUserName(userName);
+                                        userAreaRepository.save(userArea);
+                                    }else {
+                                        msg.setMsg("所选区域不存在");
+                                    }
+                                }
+                                msg.setSuccess(true);
+                                msg.setMsg("添加成功");
+                            }else {
+                                msg.setMsg("域用户已存在");
+                                return msg;
+                            }
+                        }else {
+                            msg.setMsg("负责区域不能为空");
+                        }
                     }
                 }else {
                     msg.setMsg("所在区域不能为空");
@@ -102,6 +120,19 @@ public class UserServiceImpl implements UserService {
             User user=userRepository.findByUserId(userId);
             if(user==null){
                 msg.setMsg("用户不存在");
+                return msg;
+            }
+            Group group=groupRepository.findByGroupPerson(user.getUserName());
+            if(group!=null){
+                String groupName=group.getGroupName();
+                msg.setMsg(groupName+"分组指定人为该用户，不能删除");
+                return msg;
+            }
+            GroupUser groupUser=groupUserRepository.findByUserName(user.getUserName());
+            if(groupUser!=null){
+                Group group1=groupRepository.findByGroupId(groupUser.getGroupId());
+                String groupName1=group1.getGroupName();
+                msg.setMsg(groupName1+"分组成员中存在该用户，不能删除");
                 return msg;
             }
             String userName=user.getUserName();
@@ -130,26 +161,42 @@ public class UserServiceImpl implements UserService {
                 if(areaId!=null && !"".equals(areaId)){
                     User user1=userRepository.findByUserName(userName);
                     if(user1==null || user1.getUserId()==userId){
-                        User user=userAreaVo.getUser();
-                        userRepository.save(user);
-                        List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
-                        if(userAreaList.size()>0){
-                            userAreaRepository.deleteByUserName(userName);
-                        }
-                        Long[] areaId2=userAreaVo.getAreaId();//负责区域id
-                        for(int i=0;i<areaId2.length;i++){
-                            Area area=areaRepository.findByAreaId(areaId2[i]);
-                            if(area!=null){
-                                UserArea userArea=new UserArea();
-                                userArea.setAreaId(areaId2[i]);
-                                userArea.setUserName(userName);
-                                userAreaRepository.save(userArea);
+                        if("普通用户".equals(userAreaVo.getUser().getUserRole())){
+                            List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
+                            if(userAreaList.size()>0){
+                                userAreaRepository.deleteByUserName(userName);
+                            }
+                            User user=userAreaVo.getUser();
+                            userRepository.save(user);
+                            msg.setSuccess(true);
+                            msg.setMsg("修改成功");
+                        }else {
+                            if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
+                                User user=userAreaVo.getUser();
+                                userRepository.save(user);
+                                List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
+                                if(userAreaList.size()>0){
+                                    userAreaRepository.deleteByUserName(userName);
+                                }
+                                Long[] areaId2=userAreaVo.getAreaId();//负责区域id
+                                for(int i=0;i<areaId2.length;i++){
+                                    Area area=areaRepository.findByAreaId(areaId2[i]);
+                                    if(area!=null){
+                                        UserArea userArea=new UserArea();
+                                        userArea.setAreaId(areaId2[i]);
+                                        userArea.setUserName(userName);
+                                        userAreaRepository.save(userArea);
+                                    }else {
+                                        msg.setMsg("负责区域不存在");
+                                    }
+                                }
+                                msg.setSuccess(true);
+                                msg.setMsg("修改成功");
                             }else {
-                                msg.setMsg("负责区域不存在");
+                                msg.setMsg("负责区域不能为空");
+                                return msg;
                             }
                         }
-                        msg.setSuccess(true);
-                        msg.setMsg("修改成功");
                     }else {
                         msg.setMsg("域用户已存在");
                     }

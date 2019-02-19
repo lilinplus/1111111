@@ -9,4 +9,6 @@ public interface GroupRepository extends CrudRepository<Group,Long> {
 
     Group findByGroupId(Long groupId);
 
+    Group findByGroupPerson(String groupPerson);
+
 }

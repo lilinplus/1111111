@@ -1,6 +1,6 @@
 package com.baidu.call.controller;
 
-import com.baidu.call.model.Group;
+import com.baidu.call.pojo.GroupUserVo;
 import com.baidu.call.service.GroupService;
 import com.baidu.call.utils.JsonUtils;
 import com.baidu.call.utils.page.dtgrid.Pager;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -24,22 +25,22 @@ public class GroupController {
 
     /**
      * 添加分组信息
-     * @param group
+     * @param groupUserVo
      * @param response
      */
     @ApiOperation(value = "添加分组", notes = "添加分组")
-    @ApiImplicitParam(value = "group", name = "group", dataType = "Group")
+    @ApiImplicitParam(value = "groupUserVo", name = "groupUserVo", dataType = "GroupUserVo")
     @RequestMapping(value = "/call/addgroup", method = RequestMethod.POST)
-    public void addGroup(Group group, HttpServletResponse response) {
-        JsonUtils.writeJsonBySerializer(groupService.addGroup(group), response);
+    public void addGroup(GroupUserVo groupUserVo, HttpServletResponse response) {
+        JsonUtils.writeJsonBySerializer(groupService.addGroup(groupUserVo), response);
     }
 
     /**
-     * 解除分组
+     * 删除分组
      * @param groupId
      * @param response
      */
-    @ApiOperation(value = "解除分组", notes = "解除分组")
+    @ApiOperation(value = "删除分组", notes = "删除分组")
     @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
     @RequestMapping(value = "/call/deletegroup{groupId}", method = RequestMethod.DELETE)
     public void deleteGroupId(@PathVariable Long groupId, HttpServletResponse response){
@@ -49,17 +50,17 @@ public class GroupController {
     /**
      * 修改分组信息
      * @param groupId
-     * @param group
+     * @param groupUserVo
      * @param response
      */
     @ApiOperation(value = "修改分组", notes = "修改分组")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path"),
-            @ApiImplicitParam(value = "group", name = "group", dataType = "Group")
+            @ApiImplicitParam(value = "groupUserVo", name = "groupUserVo", dataType = "GroupUserVo")
     })
     @RequestMapping(value = "/call/updategroup{groupId}", method = RequestMethod.PUT)
-    public void updateGroup(@PathVariable Long groupId, Group group, HttpServletResponse response){
-        JsonUtils.writeJsonBySerializer(groupService.updateGroup(groupId,group),response);
+    public void updateGroup(@PathVariable Long groupId, GroupUserVo groupUserVo, HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(groupService.updateGroup(groupId,groupUserVo),response);
     }
 
     /**
@@ -72,18 +73,6 @@ public class GroupController {
     @RequestMapping(value = "/call/selectgroup", method = RequestMethod.GET)
     public void queryGroup(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.queryGroup(pager),response);
-    }
-
-    /**
-     * 根据分组id查询该分组下成员域用户
-     * @param groupId
-     * @param response
-     */
-    @ApiOperation(value = "查询该分组下成员域用户",notes = "查询该分组下成员域用户")
-    @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/queryGroupMemberName{groupId}",method = RequestMethod.GET)
-    public void queryGroupMemberName(@PathVariable Long groupId,HttpServletResponse response){
-        JsonUtils.writeJsonBySerializer(groupService.queryGroupMemberName(groupId),response);
     }
 
 }

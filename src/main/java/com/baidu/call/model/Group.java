@@ -18,4 +18,8 @@ public class Group {
     @Size(max = 50,message = "长度不得超过50")
     private String groupName;//分组名
 
+    @Column(name = "group_person")
+    @Size(max = 50,message = "长度不得超过50")
+    private String groupPerson;//指定人
+
 }

@@ -3,14 +3,15 @@ package com.baidu.call.service.Impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.call.model.Group;
-import com.baidu.call.model.Member;
+import com.baidu.call.model.GroupUser;
+import com.baidu.call.model.User;
+import com.baidu.call.pojo.GroupUserVo;
 import com.baidu.call.repository.GroupRepository;
 import com.baidu.call.repository.GroupUserRepository;
-import com.baidu.call.repository.MemberRepository;
+import com.baidu.call.repository.UserRepository;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.GroupService;
 import com.baidu.call.utils.Msg;
-import com.baidu.call.utils.ValidatorUtil;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,27 +35,50 @@ public class GroupServiceImpl implements GroupService {
     private GroupRepository groupRepository;
 
     @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
     private GroupUserRepository groupUserRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
-    public Msg addGroup(Group group) {
+    @Transactional(rollbackFor = Exception.class)
+    public Msg addGroup(GroupUserVo groupUserVo) {
         Msg msg = new Msg(false, "添加失败");
         try{
-            String groupName=group.getGroupName();
-            if(groupName!=null && !"".equals(groupName)){
-                Group group1=groupRepository.findByGroupName(groupName);
-                if(group1==null){
-                    groupRepository.save(group);
-                    msg.setSuccess(true);
-                    msg.setMsg("添加成功");
+            String groupName=groupUserVo.getGroup().getGroupName();
+            String groupPerson=groupUserVo.getGroup().getGroupPerson();
+            String[] userName=groupUserVo.getUserName();
+            if(groupName!=null && !"".equals(groupName) && groupPerson!=null && !"".equals(groupPerson)){
+                if(userName!=null && !"".equals(userName)){
+                    Group group1=groupRepository.findByGroupName(groupName);
+                    if(group1==null){
+                        Group group=new Group();
+                        group.setGroupName(groupName);
+                        group.setGroupPerson(groupPerson);
+                        groupRepository.save(group);
+                        for(int i=0;i<userName.length;i++){
+                            User user = userRepository.findByUserName(userName[i]);
+                            if(user!=null){
+                                Long groupId=group.getGroupId();
+                                GroupUser groupUser=new GroupUser();
+                                groupUser.setGroupId(groupId);
+                                groupUser.setUserName(userName[i]);
+                                groupUserRepository.save(groupUser);
+                            }else {
+                                msg.setMsg("所选成员不存在");
+                                return msg;
+                            }
+                        }
+                        msg.setSuccess(true);
+                        msg.setMsg("添加成功");
+                    }else {
+                        msg.setMsg("分组名已存在");
+                    }
                 }else {
-                    msg.setMsg("分组名已存在");
+                    msg.setMsg("成员不能为空");
                 }
             }else {
-                msg.setMsg("分组名不能为空");
+                msg.setMsg("分组名和指定人不能为空");
             }
         }catch (Exception e){
             msg.setMsg("添加失败"+e);
@@ -62,7 +86,7 @@ public class GroupServiceImpl implements GroupService {
         return msg;
     }
 
-    //解除分组
+    //删除分组
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Msg deleteGroup(Long groupId) {
@@ -73,7 +97,6 @@ public class GroupServiceImpl implements GroupService {
                 msg.setMsg("信息不存在");
                 return msg;
             }
-            memberRepository.deleteByMemberGroupId(groupId);
             groupUserRepository.deleteByGroupId(groupId);
             groupRepository.deleteById(groupId);
             msg.setSuccess(true);
@@ -85,31 +108,43 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Msg updateGroup(Long groupId, Group group) {
+    @Transactional(rollbackFor = Exception.class)
+    public Msg updateGroup(Long groupId, GroupUserVo groupUserVo) {
         Msg msg = new Msg(false, "修改失败");
         try {
-            List list = ValidatorUtil.validateList(group);
-            if(list != null && list.size() > 0){
-                msg.setMsg(list.get(0).toString());
-                return msg;
-            }
-            if(!groupId.toString().equals(groupRepository.findByGroupId(groupId).getGroupId().toString())){
-                msg.setMsg("信息错误，请检查更新的信息");
-                return msg;
-            }
-            if(groupRepository.findByGroupId(groupId)==null){
-                msg.setMsg("信息不存在");
-                return msg;
-            }
-            String groupName=group.getGroupName();
-            if(groupName!=null && !"".equals(groupName)){
-                Group group1=groupRepository.findByGroupName(groupName);
-                if(group1==null || group1.getGroupId()==groupId){
-                    groupRepository.save(group);
-                    msg.setSuccess(true);
-                    msg.setMsg("修改成功");
+            String groupName=groupUserVo.getGroup().getGroupName();//域用户
+            String groupPerson=groupUserVo.getGroup().getGroupPerson();//指定人
+            String[] userName=groupUserVo.getUserName();//分组成员
+            Long groupId2=groupUserVo.getGroup().getGroupId();//分组id
+            if(groupName!=null && !"".equals(groupName) && groupPerson!=null && !"".equals(groupPerson)){
+                if(userName!=null && !"".equals(userName)) {
+                    Group group1 = groupRepository.findByGroupName(groupName);
+                    if (group1 == null || group1.getGroupId() == groupId) {
+                        Group group=groupUserVo.getGroup();
+                        groupRepository.save(group);
+                        List<GroupUser> groupUserList=groupUserRepository.findByGroupId(groupId2);
+                        if(groupUserList.size()>0){
+                            groupUserRepository.deleteByGroupId(groupId2);
+                        }
+
+                        for(int i=0;i<userName.length;i++){
+                            User user = userRepository.findByUserName(userName[i]);
+                            if(user!=null){
+                                GroupUser groupUser=new GroupUser();
+                                groupUser.setGroupId(groupId);
+                                groupUser.setUserName(userName[i]);
+                                groupUserRepository.save(groupUser);
+                            }else {
+                                msg.setMsg("所选成员不存在!");
+                            }
+                        }
+                        msg.setSuccess(true);
+                        msg.setMsg("修改成功");
+                    } else {
+                        msg.setMsg("分组名已存在");
+                    }
                 }else {
-                    msg.setMsg("分组名已存在");
+                    msg.setMsg("成员不能为空");
                 }
             }else {
                 msg.setMsg("分组名不能为空");
@@ -120,6 +155,7 @@ public class GroupServiceImpl implements GroupService {
         return msg;
     }
 
+    //查询分组信息
     @Override
     public Pager queryGroup(Pager pager) {
         Integer page = pager.getNowPage();
@@ -151,9 +187,30 @@ public class GroupServiceImpl implements GroupService {
             List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
             if (retVal.size() > 0) {
                 for (int j = 0; j < retVal.size(); j++) {
+                    Long groupId= Long.valueOf(JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("group_id").toString());
                     Map map = new HashMap();
                     map.put("groupId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("group_id"));
                     map.put("groupName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("group_name"));
+                    map.put("groupPerson", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("group_person"));
+                    List<GroupUser> groupUserList=groupUserRepository.findByGroupId(groupId);
+                    if(groupUserList!=null){
+                        String str[] = new String[groupUserList.size()];
+                        for(int p=0;p<groupUserList.size();p++){
+                            String userName=groupUserList.get(p).getUserName();
+                            str[p]=userName;
+                        }
+                        StringBuffer permission=new StringBuffer();
+                        if(str.length>0){
+                            for(int m=0;m<str.length;m++){
+                                if(m==0){
+                                    permission.append(str[0].toString());
+                                }else {
+                                    permission.append(","+str[m].toString());
+                                }
+                            }
+                        }
+                        map.put("member",permission);
+                    }
                     listMap.add(map);
                 }
             }
@@ -167,21 +224,6 @@ public class GroupServiceImpl implements GroupService {
             e.printStackTrace();
         }
         return pager;
-    }
-
-    //根据分组id查询该分组下成员域用户
-    @Override
-    public Msg queryGroupMemberName(Long groupId) {
-        Msg msg = new Msg(false,"查询失败");
-        List<Member> memberList=memberRepository.findByMemberGroupId(groupId);
-        List list=new ArrayList();
-        for(int i=0;i<memberList.size();i++){
-            list.add(memberList.get(i).getMemberName());
-        }
-        msg.setObj(list);
-        msg.setSuccess(true);
-        msg.setMsg("查询成功");
-        return msg;
     }
 
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
