@@ -122,9 +122,9 @@ public class UserServiceImpl implements UserService {
                 msg.setMsg("用户不存在");
                 return msg;
             }
-            Group group=groupRepository.findByGroupPerson(user.getUserName());
+            List<Group> group=groupRepository.findByGroupPerson(user.getUserName());
             if(group!=null){
-                String groupName=group.getGroupName();
+                String groupName=group.get(0).getGroupName();
                 msg.setMsg(groupName+"分组指定人为该用户，不能删除");
                 return msg;
             }
