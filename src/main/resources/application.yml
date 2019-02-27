@@ -13,6 +13,12 @@ spring:
       enabled: true
   application:
     name: calltape
+  #文件上传下载大小
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
 jasypt:
   encryptor:
     password: EbfYkitulv73I2p0mXI50JMXoaxZTKJ7

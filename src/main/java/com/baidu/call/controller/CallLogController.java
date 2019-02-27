@@ -1,19 +1,23 @@
 package com.baidu.call.controller;
 
+import com.baidu.call.model.CallLog;
+import com.baidu.call.repository.CallLogRepository;
 import com.baidu.call.service.CallLogService;
 import com.baidu.call.utils.JsonUtils;
+import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 @RestController
 @Api(tags = "录音信息相关接口")
@@ -21,6 +25,9 @@ public class CallLogController {
 
     @Autowired
     private CallLogService callLogService;
+
+    @Autowired
+    private CallLogRepository callLogRepository;
 
     /**
      * 查询当前用户录音信息
@@ -92,6 +99,48 @@ public class CallLogController {
     @RequestMapping(value = "/call/selectGroupMember{groupName}", method = RequestMethod.GET)
     public void queryGroupMember(@PathVariable String groupName, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(callLogService.queryGroupMember(groupName),response);
+    }
+
+    /**
+     * 文件下载
+     */
+    @ResponseBody
+    @ApiOperation(value = "附件下载", notes = "downloadFile")
+    @RequestMapping(value = "/downloadFile", method = RequestMethod.GET)
+    public Msg downloadFile(HttpServletResponse response,Long id) {
+        Msg msg = new Msg();
+        try {
+            CallLog callLog=callLogRepository.findCallLogById(id);
+            String filePathName=callLog.getRecordingFilename();
+            String fileName = filePathName.split("/")[filePathName.split("/").length - 1].toString();
+            File file = new File(filePathName);
+            if (!file.exists()) {
+                msg.setMsg("文件路径不存在");
+                return msg;
+            }
+            response.reset();
+//        response.setContentType("multipart/form-data");
+//        response.setHeader("Content-Disposition", "attachment;fileName="+fileName);
+            response.setHeader("content-type", "application/octet-stream");
+            response.setContentType("application/octet-stream;charset=UTF-8");
+            response.setHeader("Content-disposition","attachment;filename="+new String(fileName.getBytes("UTF-8"),"iso-8859-1"));
+
+            InputStream inStream = new FileInputStream(filePathName);
+            OutputStream os = response.getOutputStream();
+            byte[] buff = new byte[1024];
+            int len = -1;
+            while ((len = inStream.read(buff)) > 0) {
+                os.write(buff, 0, len);
+            }
+            os.flush();
+            os.close();
+            inStream.close();
+            msg.setMsg("下载成功");
+            msg.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return msg;
     }
 
 }

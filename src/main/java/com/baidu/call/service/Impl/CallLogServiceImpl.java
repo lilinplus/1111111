@@ -48,6 +48,9 @@ public class CallLogServiceImpl implements CallLogService {
     @Autowired
     private GroupUserRepository groupUserRepository;
 
+    @Autowired
+    private CallLogRepository callLogRepository;
+
     //查询当前用户录音信息
     @Override
     public Pager queryCallLog(Pager pager) {
@@ -263,6 +266,7 @@ public class CallLogServiceImpl implements CallLogService {
         }
         return msg;
     }
+
 
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
         String sql2 = "select count(*) from (" + sql1 + ") t";

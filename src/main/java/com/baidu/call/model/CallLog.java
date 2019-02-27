@@ -13,7 +13,7 @@ public class CallLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;//id
+    private long id;//id
 
     @Column(name = "group_type")
     @Size(max = 10,message = "长度不得超过10")
@@ -73,11 +73,11 @@ public class CallLog {
 
     @Column(name = "duration")
     @Size(max = 11,message = "长度不得超过11")
-    private Long duration;
+    private Integer duration;
 
     @Column(name = "bill_second")
     @Size(max = 11,message = "长度不得超过11")
-    private Long billSecond;
+    private Integer billSecond;
 
     @Column(name = "call_status")
     @Size(max = 32,message = "长度不得超过32")
@@ -85,7 +85,7 @@ public class CallLog {
 
     @Column(name = "ama_flags")
     @Size(max = 11,message = "长度不得超过11")
-    private Long amaFlags;
+    private Integer amaFlags;
 
     @Column(name = "account_pin_code")
     @Size(max = 150,message = "长度不得超过150")
@@ -109,7 +109,7 @@ public class CallLog {
 
     @Column(name = "recording_timelen")
     @Size(max = 11,message = "长度不得超过11")
-    private Long recordingTimelen;
+    private Integer recordingTimelen;
 
     @Column(name = "recording_conf_filename")
     @Size(max = 256,message = "长度不得超过256")
@@ -117,7 +117,7 @@ public class CallLog {
 
     @Column(name = "recording_conf_timelen")
     @Size(max = 11,message = "长度不得超过11")
-    private Long recordingConfTimelen;
+    private Integer recordingConfTimelen;
 
     @Column(name = "recording_onetouch_filename")
     @Size(max = 256,message = "长度不得超过256")
@@ -125,13 +125,13 @@ public class CallLog {
 
     @Column(name = "recording_onetouch_timelen")
     @Size(max = 11,message = "长度不得超过11")
-    private Long recordingOnetouchTimelen;
+    private Integer recordingOnetouchTimelen;
 
     @Column(name = "conference_name")
     @Size(max = 16,message = "长度不得超过16")
     private String conferenceName;
 
     @Column(name = "ftp_upload")
-    private Enum ftpUpload;
+    private String ftpUpload;
 
 }
