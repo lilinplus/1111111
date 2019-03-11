@@ -75,4 +75,27 @@ public class UserController {
         JsonUtils.writeJsonBySerializer(userService.queryUser(pager),response);
     }
 
+    /**
+     * 获取用户信息
+     * @param userName
+     * @param response
+     */
+    @ApiOperation(value = "获取用户信息",notes = "getUserInfoOne")
+    @RequestMapping(value = "/call/getUserInfoOne",method = RequestMethod.GET)
+    public void getUserInfoOne(String userName, HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(userService.getUserInfoOne(userName), response);
+    }
+
+    /**
+     * 根据域账户精确查询uic信息
+     *
+     * @param username
+     */
+    @ApiOperation(value = "查询uic用户信息", notes = "查询uic用户信息")
+    @ApiImplicitParam(value = "username", name = "username", dataType = "String",paramType = "path")
+    @RequestMapping(value = "/call/findUicUser/{username}", method = RequestMethod.GET)
+    public void findUserByUsernameUic(@PathVariable String username,HttpServletResponse response) {
+        JsonUtils.writeJsonBySerializer(userService.findUserByUsernameUic(username), response);
+    }
+
 }

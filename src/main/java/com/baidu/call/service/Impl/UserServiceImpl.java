@@ -8,9 +8,13 @@ import com.baidu.call.repository.*;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.UserService;
 import com.baidu.call.utils.Msg;
+import com.baidu.call.utils.SelectText;
 import com.baidu.call.utils.page.dtgrid.Pager;
+import com.baidu.uic.ws.dto.UserDTO;
+import com.baidu.uic.ws.interfaces.IUserRemoteService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +45,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private GroupUserRepository groupUserRepository;
+
+    @Autowired
+    private IUserRemoteService uicUserRemoteService;
 
     //添加用户
     @Override
@@ -287,6 +294,60 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return pager;
+    }
+
+    @Override
+    public Msg getUserInfoOne(String userName) {
+        Msg msg = new Msg();
+        try {
+            User user = userRepository.findByUserName(userName);
+            UserAreaVo userAreaVo = new UserAreaVo();
+            userAreaVo.setUser(user);
+            BeanUtils.copyProperties(user, userAreaVo);
+            if(user != null){
+                List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+                Long [] areaId = new Long[userAreaList.size()];
+                if(userAreaList.size()>0){
+                    for (int j = 0; j < userAreaList.size(); j++) {
+                        areaId[j] = userAreaList.get(j).getAreaId();
+                    }
+                    userAreaVo.setAreaId(areaId);
+                }else{
+                    userAreaVo.setAreaId(null);
+                }
+                msg.setSuccess(true);
+                msg.setMsg("查询成功");
+                msg.setObj(userAreaVo);
+            }else{
+                msg.setMsg("该用户信息不存在");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return msg;
+    }
+
+    /**
+     * 根据username精确查询uic用户
+     *
+     * @param username
+     * @return
+     */
+    @Override
+    public SelectText findUserByUsernameUic(String username) {
+        SelectText selectText = new SelectText();
+        try {
+            UserDTO userDTO = uicUserRemoteService.getUserByUsername(username);
+            if (userDTO != null) {
+                selectText.setName(userDTO.getName());
+                selectText.setUsername(userDTO.getUsername());
+                selectText.setHiAccount(userDTO.getHiNumber());
+                selectText.setPhoneNumber(userDTO.getPhoneNumber());
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return selectText;
     }
 
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
