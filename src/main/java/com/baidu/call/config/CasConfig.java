@@ -2,18 +2,16 @@ package com.baidu.call.config;
 
 import org.jasig.cas.client.authentication.AuthenticationFilter;
 import org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Created by chenshouqin on 2016-11-06 15:57.
  * Contact: BaiduHI : garychenqin, QQ:1175340090
  */
 
-@Configuration
-@ConfigurationProperties(prefix = "cas", ignoreUnknownFields = true)
+//@Configuration
+//@ConfigurationProperties(prefix = "cas", ignoreUnknownFields = true)
 public class CasConfig {
 
     private String casServerUrlPrefix;  // sso验证地址
