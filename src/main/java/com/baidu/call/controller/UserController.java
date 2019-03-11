@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -22,6 +23,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * 添加用户
@@ -96,6 +100,15 @@ public class UserController {
     @RequestMapping(value = "/call/findUicUser/{username}", method = RequestMethod.GET)
     public void findUserByUsernameUic(@PathVariable String username,HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(userService.findUserByUsernameUic(username), response);
+    }
+
+    /**
+     * 获取当前登录用户的基本信息
+     */
+    @ApiOperation(value = "获取当前登录用户的基本信息", notes = "获取当前登录用户的基本信息")
+    @RequestMapping(value = "/api/loginUserInfo", method = RequestMethod.GET)
+    public void getLoginUserInfo(HttpServletResponse response) {
+        JsonUtils.writeJsonBySerializer(userService.getLoginUserInfo(request), response);
     }
 
 }

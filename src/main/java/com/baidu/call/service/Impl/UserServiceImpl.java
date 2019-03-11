@@ -7,6 +7,7 @@ import com.baidu.call.pojo.UserAreaVo;
 import com.baidu.call.repository.*;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.UserService;
+import com.baidu.call.utils.GetUuapUser;
 import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.SelectText;
 import com.baidu.call.utils.page.dtgrid.Pager;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 import static com.baidu.call.utils.PropertyFieldConvertor.propertyToField;
@@ -348,6 +350,38 @@ public class UserServiceImpl implements UserService {
             logger.error(e);
         }
         return selectText;
+    }
+
+    @Override
+    public Msg getLoginUserInfo(HttpServletRequest request) {
+        Msg msg = new Msg();
+        msg.setSuccess(false);
+        msg.setMsg("用户信息不存在!");
+        try {
+            String username = GetUuapUser.GetUser();
+            if (username == null) {
+                return msg;
+            }
+            User localUser = userRepository.findByUserName(username);
+            if (localUser == null) {
+                UserDTO userDTO = uicUserRemoteService.getUserByUsername(username);
+                if (userDTO != null) {
+                    User user = new User();
+                    user.setUserName(userDTO.getUsername());
+                    localUser = userRepository.save(user);
+                    msg.setSuccess(true);
+                    msg.setObj(localUser);
+                    msg.setMsg("用户信息获取成功!");
+                }
+            } else {
+                msg.setSuccess(true);
+                msg.setObj(localUser);
+                msg.setMsg("用户信息获取成功!");
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return msg;
     }
 
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {

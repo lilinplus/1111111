@@ -5,6 +5,8 @@ import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.SelectText;
 import com.baidu.call.utils.page.dtgrid.Pager;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface UserService {
 
     Msg addUser(UserAreaVo userAreaVo);
@@ -19,5 +21,8 @@ public interface UserService {
     Msg getUserInfoOne(String userName);
 
     SelectText findUserByUsernameUic(String username);
+
+    //获取登录用户的信息
+    Msg getLoginUserInfo(HttpServletRequest request);
 
 }
