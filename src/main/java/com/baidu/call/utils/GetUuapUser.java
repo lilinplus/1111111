@@ -26,7 +26,7 @@ public class GetUuapUser {
             if (assertion == null) {
 //                username = readConfigByPath("///usr/local/ITService-2.0/NoUuap/admin/LoginUser.properties", "username");
 //                username = readConfigByPath("D:\\dist\\LoginUser.properties", "username");
-                username = "zhuweidong";
+//                username = "zhuweidong";
             } else {
                 username = assertion.getPrincipal().getName();
             }
