@@ -30,7 +30,7 @@ public class GroupController {
      */
     @ApiOperation(value = "添加分组", notes = "添加分组")
     @ApiImplicitParam(value = "groupUserVo", name = "groupUserVo", dataType = "GroupUserVo")
-    @RequestMapping(value = "/call/addgroup", method = RequestMethod.POST)
+    @RequestMapping(value = "/call/addGroup", method = RequestMethod.POST)
     public void addGroup(GroupUserVo groupUserVo, HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(groupService.addGroup(groupUserVo), response);
     }
@@ -42,7 +42,7 @@ public class GroupController {
      */
     @ApiOperation(value = "删除分组", notes = "删除分组")
     @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletegroup/{groupId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deleteGroup/{groupId}", method = RequestMethod.DELETE)
     public void deleteGroupId(@PathVariable Long groupId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.deleteGroup(groupId),response);
     }
@@ -58,7 +58,7 @@ public class GroupController {
             @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "groupUserVo", name = "groupUserVo", dataType = "GroupUserVo")
     })
-    @RequestMapping(value = "/call/updategroup/{groupId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updateGroup/{groupId}", method = RequestMethod.PUT)
     public void updateGroup(@PathVariable Long groupId, GroupUserVo groupUserVo, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.updateGroup(groupId,groupUserVo),response);
     }
@@ -70,7 +70,7 @@ public class GroupController {
      */
     @ApiOperation(value = "分页查询分组", notes = "分页查询分组")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
-    @RequestMapping(value = "/call/selectgroup", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectGroup", method = RequestMethod.GET)
     public void queryGroup(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.queryGroup(pager),response);
     }

@@ -29,7 +29,7 @@ public class AreaController {
      */
     @ApiOperation(value = "添加区域", notes = "添加区域")
     @ApiImplicitParam(value = "area", name = "area", dataType = "Area")
-    @RequestMapping(value = "/call/addarea", method = RequestMethod.POST)
+    @RequestMapping(value = "/call/addArea", method = RequestMethod.POST)
     public void addArea(Area area, HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(areaService.addArea(area), response);
     }
@@ -41,7 +41,7 @@ public class AreaController {
      */
     @ApiOperation(value = "删除区域", notes = "删除区域")
     @ApiImplicitParam(value = "areaId", name = "areaId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletearea/{areaId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deleteArea/{areaId}", method = RequestMethod.DELETE)
     public void deleteArea(@PathVariable Long areaId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.deleteArea(areaId),response);
     }
@@ -57,7 +57,7 @@ public class AreaController {
             @ApiImplicitParam(value = "areaId", name = "areaId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "area", name = "area", dataType = "Area")
     })
-    @RequestMapping(value = "/call/updatearea/{areaId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updateArea/{areaId}", method = RequestMethod.PUT)
     public void updateArea(@PathVariable Long areaId,Area area,HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.updateArea(areaId,area),response);
     }
@@ -69,7 +69,7 @@ public class AreaController {
      */
     @ApiOperation(value = "分页查询区域", notes = "分页查询区域")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
-    @RequestMapping(value = "/call/selectarea", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectArea", method = RequestMethod.GET)
     public void queryArea(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.queryArea(pager),response);
     }
@@ -84,6 +84,16 @@ public class AreaController {
     @RequestMapping(value = "/call/findByAreaId/{areaId}", method = RequestMethod.GET)
     public void findByAreaId(@PathVariable Long areaId,HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.findByAreaId(areaId),response);
+    }
+
+    /**
+     * 查询所有区域
+     * @param response
+     */
+    @ApiOperation(value = "查询所有区域", notes = "查询所有区域")
+    @RequestMapping(value = "/call/findAllArea", method = RequestMethod.GET)
+    public void findAllArea(HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(areaService.findAllArea(),response);
     }
 
 }

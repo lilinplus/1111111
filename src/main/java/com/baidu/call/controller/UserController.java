@@ -34,7 +34,7 @@ public class UserController {
      */
     @ApiOperation(value = "添加用户", notes = "添加用户")
     @ApiImplicitParam(value = "userAreaVo", name = "userAreaVo", dataType = "UserAreaVo")
-    @RequestMapping(value = "/call/adduser", method = RequestMethod.POST)
+    @RequestMapping(value = "/call/addUser", method = RequestMethod.POST)
     public void addUser(UserAreaVo userAreaVo, HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(userService.addUser(userAreaVo), response);
     }
@@ -46,7 +46,7 @@ public class UserController {
      */
     @ApiOperation(value = "删除用户", notes = "删除用户")
     @ApiImplicitParam(value = "userId", name = "userId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deleteuser/{userId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deleteUser/{userId}", method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable Long userId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.deleteUser(userId),response);
     }
@@ -62,7 +62,7 @@ public class UserController {
             @ApiImplicitParam(value = "userId", name = "userId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "userAreaVo", name = "userAreaVo", dataType = "UserAreaVo")
     })
-    @RequestMapping(value = "/call/updateuser/{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updateUser/{userId}", method = RequestMethod.PUT)
     public void updateUser(@PathVariable Long userId, UserAreaVo userAreaVo, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.updateUser(userId,userAreaVo),response);
     }
@@ -74,7 +74,7 @@ public class UserController {
      */
     @ApiOperation(value = "分页查询用户", notes = "分页查询用户")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
-    @RequestMapping(value = "/call/selectuser", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectUser", method = RequestMethod.GET)
     public void queryUser(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.queryUser(pager),response);
     }
@@ -118,7 +118,7 @@ public class UserController {
      * 获取当前登录用户的基本信息
      */
     @ApiOperation(value = "获取当前登录用户的基本信息", notes = "获取当前登录用户的基本信息")
-    @RequestMapping(value = "/api/loginUserInfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/loginUserInfo", method = RequestMethod.GET)
     public void getLoginUserInfo(HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(userService.getLoginUserInfo(request), response);
     }

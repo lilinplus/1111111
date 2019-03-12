@@ -156,7 +156,7 @@ public class AreaServiceImpl implements AreaService {
                     map.put("areaId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_id"));
                     map.put("areaName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_name"));
                     map.put("areaCreatetime",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_createtime"));
-                    map.put("areaRemarks",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_remarks"));
+                    map.put("areaRemark",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("area_remark"));
                     listMap.add(map);
                 }
             }
@@ -179,6 +179,26 @@ public class AreaServiceImpl implements AreaService {
         try {
             Area area=areaRepository.findByAreaId(areaId);
             msg.setObj(area);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
+    }
+
+    //查询所有区域
+    @Override
+    public Msg findAllArea() {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            List<Area> areaList= (List<Area>) areaRepository.findAll();
+            List list=new ArrayList();
+            for(int i=0;i<areaList.size();i++){
+                String areaName=areaList.get(i).getAreaName();
+                list.add(areaName);
+            }
+            msg.setObj(list);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
         }catch (Exception e){

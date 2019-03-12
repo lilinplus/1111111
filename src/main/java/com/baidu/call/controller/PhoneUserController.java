@@ -30,7 +30,7 @@ public class PhoneUserController {
      */
     @ApiOperation(value = "添加记录", notes = "添加记录")
     @ApiImplicitParam(value = "phoneUser", name = "phoneUser", dataType = "PhoneUser")
-    @RequestMapping(value = "/call/addphoneUser", method = RequestMethod.POST)
+    @RequestMapping(value = "/call/addPhoneUser", method = RequestMethod.POST)
     public void addPhoneUser(PhoneUser phoneUser, HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(phoneUserService.addPhoneUser(phoneUser), response);
     }
@@ -42,7 +42,7 @@ public class PhoneUserController {
      */
     @ApiOperation(value = "删除记录", notes = "删除记录")
     @ApiImplicitParam(value = "phoneUserId", name = "phoneUserId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletephoneUser/{phoneUserId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletePhoneUser/{phoneUserId}", method = RequestMethod.DELETE)
     public void deletePhoneUserId(@PathVariable Long phoneUserId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.deletePhoneUser(phoneUserId),response);
     }
@@ -58,7 +58,7 @@ public class PhoneUserController {
             @ApiImplicitParam(value = "phoneUserId", name = "phoneUserId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "phoneUser", name = "phoneUser", dataType = "PhoneUser")
     })
-    @RequestMapping(value = "/call/updatephoneUser/{phoneUserId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updatePhoneUser/{phoneUserId}", method = RequestMethod.PUT)
     public void updatePhoneUser(@PathVariable Long phoneUserId, PhoneUser phoneUser, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.updatePhoneUser(phoneUserId,phoneUser),response);
     }
@@ -70,7 +70,7 @@ public class PhoneUserController {
      */
     @ApiOperation(value = "分页查询记录", notes = "分页查询记录")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
-    @RequestMapping(value = "/call/selectphoneUser", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectPhoneUser", method = RequestMethod.GET)
     public void queryPhoneUser(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.queryPhoneUser(pager),response);
     }

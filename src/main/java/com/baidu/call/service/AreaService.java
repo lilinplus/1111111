@@ -10,4 +10,5 @@ public interface AreaService {
     Msg updateArea(Long areaId,Area area);
     Pager queryArea(Pager pager);
     Msg findByAreaId(Long areaId);
+    Msg findAllArea();
 }

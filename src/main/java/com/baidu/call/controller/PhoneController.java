@@ -30,7 +30,7 @@ public class PhoneController {
      */
     @ApiOperation(value = "添加话机", notes = "添加话机")
     @ApiImplicitParam(value = "phone", name = "phone", dataType = "Phone")
-    @RequestMapping(value = "/call/addphone", method = RequestMethod.POST)
+    @RequestMapping(value = "/call/addPhone", method = RequestMethod.POST)
     public void addPhone(Phone phone, HttpServletResponse response) {
         JsonUtils.writeJsonBySerializer(phoneService.addPhone(phone), response);
     }
@@ -42,7 +42,7 @@ public class PhoneController {
      */
     @ApiOperation(value = "删除话机", notes = "删除话机")
     @ApiImplicitParam(value = "phoneId", name = "phoneId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletephone/{phoneId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletePhone/{phoneId}", method = RequestMethod.DELETE)
     public void deletePhoneId(@PathVariable Long phoneId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.deletePhone(phoneId),response);
     }
@@ -58,7 +58,7 @@ public class PhoneController {
             @ApiImplicitParam(value = "phoneId", name = "phoneId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "phone", name = "phone", dataType = "Phone")
     })
-    @RequestMapping(value = "/call/updatephone/{phoneId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updatePhone/{phoneId}", method = RequestMethod.PUT)
     public void updatePhone(@PathVariable Long phoneId, Phone phone, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.updatePhone(phoneId,phone),response);
     }
@@ -70,7 +70,7 @@ public class PhoneController {
      */
     @ApiOperation(value = "分页查询话机", notes = "分页查询话机")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
-    @RequestMapping(value = "/call/selectphone", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectPhone", method = RequestMethod.GET)
     public void queryPhone(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.queryPhone(pager),response);
     }
