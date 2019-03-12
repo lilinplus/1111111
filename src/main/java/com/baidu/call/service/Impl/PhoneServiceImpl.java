@@ -151,6 +151,21 @@ public class PhoneServiceImpl implements PhoneService {
         return pager;
     }
 
+    //根据Id查询分机号
+    @Override
+    public Msg findByPhoneId(Long phoneId) {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            Phone phone=phoneRepository.findByPhoneId(phoneId);
+            msg.setObj(phone);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
+    }
+
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
         String sql2 = "select count(*) from (" + sql1 + ") t";
         Map map = new HashMap();

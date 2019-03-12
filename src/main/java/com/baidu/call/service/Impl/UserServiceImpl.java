@@ -60,6 +60,11 @@ public class UserServiceImpl implements UserService {
             String userName=userAreaVo.getUser().getUserName();//域用户
             String role=userAreaVo.getUser().getUserRole();//角色名
             Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
+            UserDTO userDTO = uicUserRemoteService.getUserByUsername(userName);
+            if(userDTO==null){
+                msg.setMsg("域用户错误!");
+                return msg;
+            }
             if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
                 if(areaId!=null && !"".equals(areaId)){
                     if("普通用户".equals(userAreaVo.getUser().getUserRole())){
@@ -298,59 +303,102 @@ public class UserServiceImpl implements UserService {
         return pager;
     }
 
+    //根据Id查询用户
     @Override
-    public Msg getUserInfoOne(String userName) {
-        Msg msg = new Msg();
+    public Msg findByUserId(Long userId) {
+        Msg msg=new Msg(false,"查询失败!");
         try {
-            User user = userRepository.findByUserName(userName);
-            UserAreaVo userAreaVo = new UserAreaVo();
-            userAreaVo.setUser(user);
-            BeanUtils.copyProperties(user, userAreaVo);
-            if(user != null){
-                List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
-                Long [] areaId = new Long[userAreaList.size()];
-                if(userAreaList.size()>0){
-                    for (int j = 0; j < userAreaList.size(); j++) {
-                        areaId[j] = userAreaList.get(j).getAreaId();
-                    }
-                    userAreaVo.setAreaId(areaId);
-                }else{
-                    userAreaVo.setAreaId(null);
+            User user=userRepository.findByUserId(userId);
+            List<UserArea> userAreaList=userAreaRepository.findByUserName(user.getUserName());
+            Map map = new HashMap();
+            if (userAreaList != null) {
+                String strAreaId[] = new String[userAreaList.size()];
+                List<Area> areaList = new ArrayList<Area>();
+                for (int p = 0; p < userAreaList.size(); p++) {
+                    Long riAreaId = userAreaList.get(p).getAreaId();
+                    Area area = areaRepository.findByAreaId(riAreaId);
+                    areaList.add(area);
+                    strAreaId[p] = area.getAreaName();
                 }
-                msg.setSuccess(true);
-                msg.setMsg("查询成功");
-                msg.setObj(userAreaVo);
-            }else{
-                msg.setMsg("该用户信息不存在");
+                StringBuffer permission = new StringBuffer();
+                if (strAreaId.length > 0) {
+                    for (int m = 0; m < strAreaId.length; m++) {
+                        if (m == 0) {
+                            permission.append(strAreaId[0].toString());
+                        } else {
+                            permission.append("," + strAreaId[m].toString());
+                        }
+                    }
+                }
+                Area area=areaRepository.findByAreaId(user.getUserAreaId());
+                map.put("areaName", permission);
+                map.put("userId",user.getUserId());
+                map.put("userName",user.getUserName());
+                map.put("userRole",user.getUserRole());
+                map.put("userAreaName",area.getAreaName());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            msg.setObj(map);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
         }
         return msg;
     }
 
-    /**
-     * 根据username精确查询uic用户
-     *
-     * @param username
-     * @return
-     */
-    @Override
-    public SelectText findUserByUsernameUic(String username) {
-        SelectText selectText = new SelectText();
-        try {
-            UserDTO userDTO = uicUserRemoteService.getUserByUsername(username);
-            if (userDTO != null) {
-                selectText.setName(userDTO.getName());
-                selectText.setUsername(userDTO.getUsername());
-                selectText.setHiAccount(userDTO.getHiNumber());
-                selectText.setPhoneNumber(userDTO.getPhoneNumber());
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        }
-        return selectText;
-    }
+//    @Override
+//    public Msg getUserInfoOne(String userName) {
+//        Msg msg = new Msg();
+//        try {
+//            User user = userRepository.findByUserName(userName);
+//            UserAreaVo userAreaVo = new UserAreaVo();
+//            userAreaVo.setUser(user);
+//            BeanUtils.copyProperties(user, userAreaVo);
+//            if(user != null){
+//                List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+//                Long [] areaId = new Long[userAreaList.size()];
+//                if(userAreaList.size()>0){
+//                    for (int j = 0; j < userAreaList.size(); j++) {
+//                        areaId[j] = userAreaList.get(j).getAreaId();
+//                    }
+//                    userAreaVo.setAreaId(areaId);
+//                }else{
+//                    userAreaVo.setAreaId(null);
+//                }
+//                msg.setSuccess(true);
+//                msg.setMsg("查询成功");
+//                msg.setObj(userAreaVo);
+//            }else{
+//                msg.setMsg("该用户信息不存在");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return msg;
+//    }
+
+//    /**
+//     * 根据username精确查询uic用户
+//     *
+//     * @param username
+//     * @return
+//     */
+//    @Override
+//    public SelectText findUserByUsernameUic(String username) {
+//        SelectText selectText = new SelectText();
+//        try {
+//            UserDTO userDTO = uicUserRemoteService.getUserByUsername(username);
+//            if (userDTO != null) {
+//                selectText.setName(userDTO.getName());
+//                selectText.setUsername(userDTO.getUsername());
+//                selectText.setHiAccount(userDTO.getHiNumber());
+//                selectText.setPhoneNumber(userDTO.getPhoneNumber());
+//            }
+//        } catch (Exception e) {
+//            logger.error(e);
+//        }
+//        return selectText;
+//    }
 
     @Override
     public Msg getLoginUserInfo(HttpServletRequest request) {

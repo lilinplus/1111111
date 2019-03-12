@@ -2,7 +2,6 @@ package com.baidu.call.service;
 
 import com.baidu.call.pojo.UserAreaVo;
 import com.baidu.call.utils.Msg;
-import com.baidu.call.utils.SelectText;
 import com.baidu.call.utils.page.dtgrid.Pager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,10 +16,12 @@ public interface UserService {
 
     Pager queryUser(Pager pager);
 
-    //域账户查询用户信息
-    Msg getUserInfoOne(String userName);
+    Msg findByUserId(Long userId);
 
-    SelectText findUserByUsernameUic(String username);
+//    //域账户查询用户信息
+//    Msg getUserInfoOne(String userName);
+//
+//    SelectText findUserByUsernameUic(String username);
 
     //获取登录用户的信息
     Msg getLoginUserInfo(HttpServletRequest request);

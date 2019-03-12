@@ -41,7 +41,7 @@ public class AreaController {
      */
     @ApiOperation(value = "删除区域", notes = "删除区域")
     @ApiImplicitParam(value = "areaId", name = "areaId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletearea{areaId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletearea/{areaId}", method = RequestMethod.DELETE)
     public void deleteArea(@PathVariable Long areaId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.deleteArea(areaId),response);
     }
@@ -57,7 +57,7 @@ public class AreaController {
             @ApiImplicitParam(value = "areaId", name = "areaId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "area", name = "area", dataType = "Area")
     })
-    @RequestMapping(value = "/call/updatearea{areaId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updatearea/{areaId}", method = RequestMethod.PUT)
     public void updateArea(@PathVariable Long areaId,Area area,HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.updateArea(areaId,area),response);
     }
@@ -72,6 +72,18 @@ public class AreaController {
     @RequestMapping(value = "/call/selectarea", method = RequestMethod.GET)
     public void queryArea(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(areaService.queryArea(pager),response);
+    }
+
+    /**
+     * 根据Id查询区域
+     * @param areaId
+     * @param response
+     */
+    @ApiOperation(value = "根据Id查询区域", notes = "根据Id查询区域")
+    @ApiImplicitParam(name = "areaId", value = "areaId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/findByAreaId/{areaId}", method = RequestMethod.GET)
+    public void findByAreaId(@PathVariable Long areaId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(areaService.findByAreaId(areaId),response);
     }
 
 }

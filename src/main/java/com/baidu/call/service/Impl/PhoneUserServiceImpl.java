@@ -2,7 +2,9 @@ package com.baidu.call.service.Impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.call.model.Phone;
 import com.baidu.call.model.PhoneUser;
+import com.baidu.call.repository.PhoneRepository;
 import com.baidu.call.repository.PhoneUserRepository;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.PhoneUserService;
@@ -31,6 +33,9 @@ public class PhoneUserServiceImpl implements PhoneUserService {
 
     @Autowired
     private PhoneUserRepository phoneUserRepository;
+
+    @Autowired
+    private PhoneRepository phoneRepository;
 
     //添加用户使用话机的时间段
     @Override
@@ -144,6 +149,28 @@ public class PhoneUserServiceImpl implements PhoneUserService {
             e.printStackTrace();
         }
         return pager;
+    }
+
+    //根据Id查询
+    @Override
+    public Msg findByPhoneUserId(Long phoneUserId) {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            PhoneUser phoneUser=phoneUserRepository.findByPhoneUserId(phoneUserId);
+            Phone phone=phoneRepository.findByPhoneId(phoneUser.getPhoneNumId());
+            Map map = new HashMap();
+            map.put("phoneUserId",phoneUser.getPhoneUserId());
+            map.put("userName",phoneUser.getUserName());
+            map.put("phoneStarttime",phoneUser.getPhoneStarttime());
+            map.put("phoneEndtime",phoneUser.getPhoneEndtime());
+            map.put("phoneName",phone.getPhoneName());
+            msg.setObj(map);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
     }
 
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {

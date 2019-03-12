@@ -42,7 +42,7 @@ public class PhoneController {
      */
     @ApiOperation(value = "删除话机", notes = "删除话机")
     @ApiImplicitParam(value = "phoneId", name = "phoneId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletephone{phoneId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletephone/{phoneId}", method = RequestMethod.DELETE)
     public void deletePhoneId(@PathVariable Long phoneId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.deletePhone(phoneId),response);
     }
@@ -58,7 +58,7 @@ public class PhoneController {
             @ApiImplicitParam(value = "phoneId", name = "phoneId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "phone", name = "phone", dataType = "Phone")
     })
-    @RequestMapping(value = "/call/updatephone{phoneId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updatephone/{phoneId}", method = RequestMethod.PUT)
     public void updatePhone(@PathVariable Long phoneId, Phone phone, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.updatePhone(phoneId,phone),response);
     }
@@ -73,6 +73,18 @@ public class PhoneController {
     @RequestMapping(value = "/call/selectphone", method = RequestMethod.GET)
     public void queryPhone(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneService.queryPhone(pager),response);
+    }
+
+    /**
+     * 根据Id查询分机号
+     * @param phoneId
+     * @param response
+     */
+    @ApiOperation(value = "根据Id查询分机号", notes = "根据Id查询分机号")
+    @ApiImplicitParam(name = "phoneId", value = "phoneId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/findByPhoneId/{phoneId}", method = RequestMethod.GET)
+    public void findByPhoneId(@PathVariable Long phoneId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(phoneService.findByPhoneId(phoneId),response);
     }
 
 }

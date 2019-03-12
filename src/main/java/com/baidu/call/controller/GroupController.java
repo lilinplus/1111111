@@ -42,7 +42,7 @@ public class GroupController {
      */
     @ApiOperation(value = "删除分组", notes = "删除分组")
     @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletegroup{groupId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletegroup/{groupId}", method = RequestMethod.DELETE)
     public void deleteGroupId(@PathVariable Long groupId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.deleteGroup(groupId),response);
     }
@@ -58,7 +58,7 @@ public class GroupController {
             @ApiImplicitParam(value = "groupId", name = "groupId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "groupUserVo", name = "groupUserVo", dataType = "GroupUserVo")
     })
-    @RequestMapping(value = "/call/updategroup{groupId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updategroup/{groupId}", method = RequestMethod.PUT)
     public void updateGroup(@PathVariable Long groupId, GroupUserVo groupUserVo, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.updateGroup(groupId,groupUserVo),response);
     }
@@ -73,6 +73,18 @@ public class GroupController {
     @RequestMapping(value = "/call/selectgroup", method = RequestMethod.GET)
     public void queryGroup(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(groupService.queryGroup(pager),response);
+    }
+
+    /**
+     * 根据Id查询分组
+     * @param groupId
+     * @param response
+     */
+    @ApiOperation(value = "根据Id查询分组", notes = "根据Id查询分组")
+    @ApiImplicitParam(name = "groupId", value = "groupId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/findByGroupId/{groupId}", method = RequestMethod.GET)
+    public void findByGroupId(@PathVariable Long groupId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(groupService.findByGroupId(groupId),response);
     }
 
 }

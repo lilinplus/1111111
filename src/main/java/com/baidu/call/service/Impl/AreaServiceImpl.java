@@ -172,6 +172,21 @@ public class AreaServiceImpl implements AreaService {
         return pager;
     }
 
+    //根据Id查询区域
+    @Override
+    public Msg findByAreaId(Long areaId) {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            Area area=areaRepository.findByAreaId(areaId);
+            msg.setObj(area);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
+    }
+
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
         String sql2 = "select count(*) from (" + sql1 + ") t";
         Map map = new HashMap();

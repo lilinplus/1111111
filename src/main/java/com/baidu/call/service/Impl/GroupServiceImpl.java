@@ -226,6 +226,48 @@ public class GroupServiceImpl implements GroupService {
         return pager;
     }
 
+    //根据Id查询分组
+    @Override
+    public Msg findByGroupId(Long groupId) {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            Group group=groupRepository.findByGroupId(groupId);
+            if(group==null){
+                msg.setMsg("分组不存在!");
+                return msg;
+            }
+            List<GroupUser> groupUserList=groupUserRepository.findByGroupId(groupId);
+            Map map = new HashMap();
+            if (groupUserList != null) {
+                String strAreaId[] = new String[groupUserList.size()];
+                List<Group> groupList = new ArrayList<Group>();
+                for (int p = 0; p < groupUserList.size(); p++) {
+                    strAreaId[p] = groupUserList.get(p).getUserName();
+                }
+                StringBuffer permission = new StringBuffer();
+                if (strAreaId.length > 0) {
+                    for (int m = 0; m < strAreaId.length; m++) {
+                        if (m == 0) {
+                            permission.append(strAreaId[0].toString());
+                        } else {
+                            permission.append("," + strAreaId[m].toString());
+                        }
+                    }
+                }
+                map.put("member", permission);
+                map.put("groupId",group.getGroupId());
+                map.put("groupName",group.getGroupName());
+                map.put("groupPerson",group.getGroupPerson());
+            }
+            msg.setObj(map);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败 "+e);
+        }
+        return msg;
+    }
+
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
         String sql2 = "select count(*) from (" + sql1 + ") t";
         Map map = new HashMap();

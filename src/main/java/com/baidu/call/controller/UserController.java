@@ -46,7 +46,7 @@ public class UserController {
      */
     @ApiOperation(value = "删除用户", notes = "删除用户")
     @ApiImplicitParam(value = "userId", name = "userId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deleteuser{userId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deleteuser/{userId}", method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable Long userId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.deleteUser(userId),response);
     }
@@ -62,7 +62,7 @@ public class UserController {
             @ApiImplicitParam(value = "userId", name = "userId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "userAreaVo", name = "userAreaVo", dataType = "UserAreaVo")
     })
-    @RequestMapping(value = "/call/updateuser{userId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updateuser/{userId}", method = RequestMethod.PUT)
     public void updateUser(@PathVariable Long userId, UserAreaVo userAreaVo, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.updateUser(userId,userAreaVo),response);
     }
@@ -80,27 +80,39 @@ public class UserController {
     }
 
     /**
-     * 获取用户信息
-     * @param userName
+     * 根据Id查询用户
+     * @param userId
      * @param response
      */
-    @ApiOperation(value = "获取用户信息",notes = "getUserInfoOne")
-    @RequestMapping(value = "/call/getUserInfoOne",method = RequestMethod.GET)
-    public void getUserInfoOne(String userName, HttpServletResponse response){
-        JsonUtils.writeJsonBySerializer(userService.getUserInfoOne(userName), response);
+    @ApiOperation(value = "根据Id查询用户", notes = "根据Id查询用户")
+    @ApiImplicitParam(name = "userId", value = "userId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/findByUserId/{userId}", method = RequestMethod.GET)
+    public void findByUserId(@PathVariable Long userId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(userService.findByUserId(userId),response);
     }
 
-    /**
-     * 根据域账户精确查询uic信息
-     *
-     * @param username
-     */
-    @ApiOperation(value = "查询uic用户信息", notes = "查询uic用户信息")
-    @ApiImplicitParam(value = "username", name = "username", dataType = "String",paramType = "path")
-    @RequestMapping(value = "/call/findUicUser/{username}", method = RequestMethod.GET)
-    public void findUserByUsernameUic(@PathVariable String username,HttpServletResponse response) {
-        JsonUtils.writeJsonBySerializer(userService.findUserByUsernameUic(username), response);
-    }
+//    /**
+//     * 获取用户信息
+//     * @param userName
+//     * @param response
+//     */
+//    @ApiOperation(value = "获取用户信息",notes = "getUserInfoOne")
+//    @RequestMapping(value = "/call/getUserInfoOne",method = RequestMethod.GET)
+//    public void getUserInfoOne(String userName, HttpServletResponse response){
+//        JsonUtils.writeJsonBySerializer(userService.getUserInfoOne(userName), response);
+//    }
+//
+//    /**
+//     * 根据域账户精确查询uic信息
+//     *
+//     * @param username
+//     */
+//    @ApiOperation(value = "查询uic用户信息", notes = "查询uic用户信息")
+//    @ApiImplicitParam(value = "username", name = "username", dataType = "String",paramType = "path")
+//    @RequestMapping(value = "/call/findUicUser/{username}", method = RequestMethod.GET)
+//    public void findUserByUsernameUic(@PathVariable String username,HttpServletResponse response) {
+//        JsonUtils.writeJsonBySerializer(userService.findUserByUsernameUic(username), response);
+//    }
 
     /**
      * 获取当前登录用户的基本信息

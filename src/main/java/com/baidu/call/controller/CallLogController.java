@@ -52,7 +52,7 @@ public class CallLogController {
             @ApiImplicitParam(value = "pager", name = "pager", dataType = "Pager"),
             @ApiImplicitParam(value = "userName", name = "userName", dataType = "String",paramType = "path")
     })
-    @RequestMapping(value = "/call/selectCallLog{userName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectCallLog/{userName}", method = RequestMethod.GET)
     public void queryUserCallLog(Pager pager,@PathVariable String userName, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(callLogService.queryUserCallLog(pager,userName),response);
     }
@@ -74,7 +74,7 @@ public class CallLogController {
      */
     @ApiOperation(value = "查询该区域下所有用户", notes = "查询该区域下所有用户")
     @ApiImplicitParam(name = "areaName", value = "areaName", dataType = "String",paramType = "path")
-    @RequestMapping(value = "/call/selectAreaMember{areaName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectAreaMember/{areaName}", method = RequestMethod.GET)
     public void queryAreaMember(@PathVariable String areaName, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(callLogService.queryAreaMember(areaName),response);
     }
@@ -96,7 +96,7 @@ public class CallLogController {
      */
     @ApiOperation(value = "查询分组成员", notes = "查询分组成员")
     @ApiImplicitParam(name = "groupName", value = "groupName", dataType = "String",paramType = "path")
-    @RequestMapping(value = "/call/selectGroupMember{groupName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/call/selectGroupMember/{groupName}", method = RequestMethod.GET)
     public void queryGroupMember(@PathVariable String groupName, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(callLogService.queryGroupMember(groupName),response);
     }

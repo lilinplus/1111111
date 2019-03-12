@@ -14,4 +14,6 @@ public interface PhoneService {
 
     Pager queryPhone(Pager pager);
 
+    Msg findByPhoneId(Long phoneId);
+
 }

@@ -42,7 +42,7 @@ public class PhoneUserController {
      */
     @ApiOperation(value = "删除记录", notes = "删除记录")
     @ApiImplicitParam(value = "phoneUserId", name = "phoneUserId", dataType = "Long",paramType = "path")
-    @RequestMapping(value = "/call/deletephoneUser{phoneUserId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/call/deletephoneUser/{phoneUserId}", method = RequestMethod.DELETE)
     public void deletePhoneUserId(@PathVariable Long phoneUserId, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.deletePhoneUser(phoneUserId),response);
     }
@@ -58,7 +58,7 @@ public class PhoneUserController {
             @ApiImplicitParam(value = "phoneUserId", name = "phoneUserId", dataType = "Long",paramType = "path"),
             @ApiImplicitParam(value = "phoneUser", name = "phoneUser", dataType = "PhoneUser")
     })
-    @RequestMapping(value = "/call/updatephoneUser{phoneUserId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/call/updatephoneUser/{phoneUserId}", method = RequestMethod.PUT)
     public void updatePhoneUser(@PathVariable Long phoneUserId, PhoneUser phoneUser, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.updatePhoneUser(phoneUserId,phoneUser),response);
     }
@@ -73,6 +73,18 @@ public class PhoneUserController {
     @RequestMapping(value = "/call/selectphoneUser", method = RequestMethod.GET)
     public void queryPhoneUser(Pager pager, HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(phoneUserService.queryPhoneUser(pager),response);
+    }
+
+    /**
+     * 根据id查询用户使用话机时间段记录
+     * @param phoneUserId
+     * @param response
+     */
+    @ApiOperation(value = "根据id查询用户使用话机时间段记录", notes = "根据id查询用户使用话机时间段记录")
+    @ApiImplicitParam(name = "phoneUserId", value = "phoneUserId", dataType = "Long",paramType = "path")
+    @RequestMapping(value = "/call/findByPhoneUserId/{phoneUserId}", method = RequestMethod.GET)
+    public void findByPhoneUserId(@PathVariable Long phoneUserId,HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(phoneUserService.findByPhoneUserId(phoneUserId),response);
     }
 
 }
