@@ -91,6 +91,16 @@ public class UserController {
         JsonUtils.writeJsonBySerializer(userService.findByUserId(userId),response);
     }
 
+    /**
+     * 查询所有用户
+     * @param response
+     */
+    @ApiOperation(value = "查询所有用户", notes = "查询所有用户")
+    @RequestMapping(value = "/call/findAllUser", method = RequestMethod.GET)
+    public void findAllUser(HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(userService.findAllUser(),response);
+    }
+
 //    /**
 //     * 获取用户信息
 //     * @param userName

@@ -87,4 +87,14 @@ public class PhoneController {
         JsonUtils.writeJsonBySerializer(phoneService.findByPhoneId(phoneId),response);
     }
 
+    /**
+     * 查询所有分机
+     * @param response
+     */
+    @ApiOperation(value = "查询所有分机", notes = "查询所有分机")
+    @RequestMapping(value = "/call/findAllPhone", method = RequestMethod.GET)
+    public void findAllPhone(HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(phoneService.findAllPhone(),response);
+    }
+
 }

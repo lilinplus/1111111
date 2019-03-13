@@ -16,4 +16,6 @@ public interface PhoneService {
 
     Msg findByPhoneId(Long phoneId);
 
+    Msg findAllPhone();
+
 }

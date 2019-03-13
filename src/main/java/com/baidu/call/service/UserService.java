@@ -18,6 +18,8 @@ public interface UserService {
 
     Msg findByUserId(Long userId);
 
+    Msg findAllUser();
+
 //    //域账户查询用户信息
 //    Msg getUserInfoOne(String userName);
 //

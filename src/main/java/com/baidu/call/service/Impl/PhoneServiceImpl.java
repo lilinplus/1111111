@@ -166,6 +166,25 @@ public class PhoneServiceImpl implements PhoneService {
         return msg;
     }
 
+    //查询所有分机号
+    @Override
+    public Msg findAllPhone() {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            List<Phone> phoneList= (List<Phone>) phoneRepository.findAll();
+            List list=new ArrayList();
+            for(int i=0;i<phoneList.size();i++){
+                list.add(phoneList.get(i).getPhoneName());
+            }
+            msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
+    }
+
     public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
         String sql2 = "select count(*) from (" + sql1 + ") t";
         Map map = new HashMap();

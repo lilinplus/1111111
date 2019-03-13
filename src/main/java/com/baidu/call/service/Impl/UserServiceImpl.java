@@ -346,6 +346,25 @@ public class UserServiceImpl implements UserService {
         return msg;
     }
 
+    //查询所有用户
+    @Override
+    public Msg findAllUser() {
+        Msg msg=new Msg(false,"查询失败!");
+        try {
+            List<User> userList= (List<User>) userRepository.findAll();
+            List list=new ArrayList();
+            for(int i=0;i<userList.size();i++){
+                list.add(userList.get(i).getUserName());
+            }
+            msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
+        }catch (Exception e){
+            msg.setMsg("查询失败"+e);
+        }
+        return msg;
+    }
+
 //    @Override
 //    public Msg getUserInfoOne(String userName) {
 //        Msg msg = new Msg();
