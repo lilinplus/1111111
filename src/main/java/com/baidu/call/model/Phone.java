@@ -1,6 +1,8 @@
 package com.baidu.call.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
@@ -16,6 +18,7 @@ public class Phone {
 
     @Column(name = "phone_name")
     @Size(max = 50,message = "长度不得超过50")
+    @ApiModelProperty(value = "话机名")
     private String phoneName;//话机名
 
 }

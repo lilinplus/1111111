@@ -140,7 +140,6 @@ public class AreaServiceImpl implements AreaService {
             if(orderBy != null){
                 sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
             }
-            Map returnMap = getPageInfo(sql,page,size);
             if ((size != null && size != 0) && (page != null && page != 0)) {
                 sql = sql + " limit " + (page - 1) * size + "," + size;
             } else {
@@ -149,6 +148,13 @@ public class AreaServiceImpl implements AreaService {
                 sql = sql + " limit 0,10";
             }
             List retVal = commonService.findInfoByNativeSQL(sql);
+            int pageCount=0;//总页数
+            int recordCount=retVal.size();//总记录数
+            if(recordCount % size==0){
+                pageCount = recordCount / size;
+            }else {
+                pageCount = recordCount / size + 1;
+            }
             List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
             if (retVal.size() > 0) {
                 for (int j = 0; j < retVal.size(); j++) {
@@ -163,8 +169,8 @@ public class AreaServiceImpl implements AreaService {
             pager.setExhibitDatas(listMap);
             pager.setPageSize(size);
             pager.setNowPage(page);
-            pager.setPageCount(Integer.parseInt(returnMap.get("totalPages").toString()));
-            pager.setRecordCount(Integer.parseInt(returnMap.get("totalElements").toString()));
+            pager.setPageCount(pageCount);
+            pager.setRecordCount(recordCount);
             logger.info(sql);
         } catch (Exception e) {
             e.printStackTrace();
@@ -207,30 +213,4 @@ public class AreaServiceImpl implements AreaService {
         return msg;
     }
 
-    public Map getPageInfo(String sql1 , Integer pageNum, Integer pageSize) {
-        String sql2 = "select count(*) from (" + sql1 + ") t";
-        Map map = new HashMap();
-        List queryList = commonService.findInfoByNativeSQL(sql2);
-        int totalElements = 0;
-        int totalPages = 0;
-        if (queryList.size() > 0) {
-            totalElements = (int) JSONObject.parseObject(JSON.toJSONString(queryList.get(0))).get("count(*)");
-            if (pageSize == 0) {
-                pageSize = 1;
-            }
-            if (totalElements % pageSize == 0) {
-                totalPages = totalElements / pageSize;
-            } else {
-                totalPages = totalElements / pageSize + 1;
-            }
-        }
-        if(pageNum == null){
-            pageNum = 1;
-        }
-        map.put("totalElements", totalElements);
-        map.put("totalPages", totalPages);
-        map.put("size", pageSize);
-        map.put("page", pageNum);
-        return map;
-    }
 }
