@@ -58,70 +58,70 @@ public class UserServiceImpl implements UserService {
     public Msg addUser(UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "添加失败");
         try {
-            String userName=userAreaVo.getUser().getUserName();//域用户
-            String role=userAreaVo.getUser().getUserRole();//角色名
-            Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
+            String userName = userAreaVo.getUser().getUserName();//域用户
+            String role = userAreaVo.getUser().getUserRole();//角色名
+            Long areaId = userAreaVo.getUser().getUserAreaId();//所在区域Id
             UserDTO userDTO = uicUserRemoteService.getUserByUsername(userName);
-            if(userDTO==null){
+            if (userDTO == null) {
                 msg.setMsg("域用户错误!");
                 return msg;
             }
-            if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
-                if(areaId!=null && !"".equals(areaId)){
-                    if("普通用户".equals(userAreaVo.getUser().getUserRole())){
-                        User user1=userRepository.findByUserName(userName);
-                        if(user1==null){
-                            User user=new User();
+            if (userName != null && !"".equals(userName) && role != null && !"".equals(role)) {
+                if (areaId != null && !"".equals(areaId)) {
+                    if ("普通用户".equals(userAreaVo.getUser().getUserRole())) {
+                        User user1 = userRepository.findByUserName(userName);
+                        if (user1 == null) {
+                            User user = new User();
                             user.setUserAreaId(areaId);
                             user.setUserName(userName);
                             user.setUserRole(role);
                             userRepository.save(user);
                             msg.setSuccess(true);
                             msg.setMsg("添加成功");
-                        }else {
+                        } else {
                             msg.setMsg("域用户已存在");
                             return msg;
                         }
-                    }else {
-                        if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
-                            User user1=userRepository.findByUserName(userName);
-                            String[] areaId2=userAreaVo.getAreaId();
-                            if(user1==null){
-                                User user=new User();
+                    } else {
+                        if (userAreaVo.getAreaId() != null && !"".equals(userAreaVo.getAreaId())) {
+                            User user1 = userRepository.findByUserName(userName);
+                            String[] areaId2 = userAreaVo.getAreaId();
+                            if (user1 == null) {
+                                User user = new User();
                                 user.setUserAreaId(areaId);
                                 user.setUserName(userName);
                                 user.setUserRole(role);
                                 userRepository.save(user);
-                                for(int i=0;i<areaId2.length;i++){
-                                    Area area=areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
-                                    if(area!=null){
-                                        UserArea userArea=new UserArea();
+                                for (int i = 0; i < areaId2.length; i++) {
+                                    Area area = areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
+                                    if (area != null) {
+                                        UserArea userArea = new UserArea();
                                         userArea.setAreaId(Long.valueOf(areaId2[i]));
                                         userArea.setUserName(userName);
                                         userAreaRepository.save(userArea);
-                                    }else {
+                                    } else {
                                         msg.setMsg("所选区域不存在");
                                     }
                                 }
                                 msg.setSuccess(true);
                                 msg.setMsg("添加成功");
-                            }else {
+                            } else {
                                 msg.setMsg("域用户已存在");
                                 return msg;
                             }
-                        }else {
+                        } else {
                             msg.setMsg("负责区域不能为空");
                         }
                     }
-                }else {
+                } else {
                     msg.setMsg("所在区域不能为空");
                 }
-            }else {
+            } else {
                 msg.setMsg("用户名和角色不能为空");
                 return msg;
             }
-        }catch (Exception e){
-            msg.setMsg("添加失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("添加失败" + e);
             AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
@@ -133,33 +133,33 @@ public class UserServiceImpl implements UserService {
     public Msg deleteUser(Long userId) {
         Msg msg = new Msg(false, "删除失败");
         try {
-            User user=userRepository.findByUserId(userId);
-            if(user==null){
+            User user = userRepository.findByUserId(userId);
+            if (user == null) {
                 msg.setMsg("用户不存在");
                 return msg;
             }
-            List<Group> group=groupRepository.findByGroupPerson(user.getUserName());
-            if(group.size()>0){
-                String groupName=group.get(0).getGroupName();
-                msg.setMsg(groupName+"分组指定人为该用户，不能删除");
+            List<Group> group = groupRepository.findByGroupPerson(user.getUserName());
+            if (group.size() > 0) {
+                String groupName = group.get(0).getGroupName();
+                msg.setMsg(groupName + "分组指定人为该用户，不能删除");
                 return msg;
             }
-            GroupUser groupUser=groupUserRepository.findByUserName(user.getUserName());
-            if(groupUser!=null){
-                Group group1=groupRepository.findByGroupId(groupUser.getGroupId());
-                String groupName1=group1.getGroupName();
-                msg.setMsg(groupName1+"分组成员中存在该用户，不能删除");
+            GroupUser groupUser = groupUserRepository.findByUserName(user.getUserName());
+            if (groupUser != null) {
+                Group group1 = groupRepository.findByGroupId(groupUser.getGroupId());
+                String groupName1 = group1.getGroupName();
+                msg.setMsg(groupName1 + "分组成员中存在该用户，不能删除");
                 return msg;
             }
-            String userName=user.getUserName();
-            if(userName!=null){
+            String userName = user.getUserName();
+            if (userName != null) {
                 userAreaRepository.deleteByUserName(userName);
             }
             userRepository.deleteById(userId);
             msg.setSuccess(true);
             msg.setMsg("删除成功");
-        }catch (Exception e){
-            msg.setMsg("删除失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("删除失败" + e);
         }
         return msg;
     }
@@ -167,63 +167,70 @@ public class UserServiceImpl implements UserService {
     //修改用户
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Msg updateUser(Long userId,UserAreaVo userAreaVo) {
+    public Msg updateUser(Long userId, UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "修改失败");
         try {
-            String userName=userAreaVo.getUser().getUserName();//域用户
-            String role=userAreaVo.getUser().getUserRole();//角色名
-            Long areaId=userAreaVo.getUser().getUserAreaId();//所在区域Id
-            if(userName!=null && !"".equals(userName) && role!=null && !"".equals(role)){
-                if(areaId!=null && !"".equals(areaId)){
-                    User user1=userRepository.findByUserName(userName);
-                    if(user1==null || user1.getUserId()==userId){
-                        if("普通用户".equals(userAreaVo.getUser().getUserRole())){
-                            List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
-                            if(userAreaList.size()>0){
+            User user2 = userRepository.findByUserId(userId);
+            if (user2 == null) {
+                msg.setMsg("信息不存在!");
+                return msg;
+            }
+            String userName = userAreaVo.getUser().getUserName();//域用户
+            String role = userAreaVo.getUser().getUserRole();//角色名
+            Long areaId = userAreaVo.getUser().getUserAreaId();//所在区域Id
+            if (userName != null && !"".equals(userName) && role != null && !"".equals(role)) {
+                if (areaId != null && !"".equals(areaId)) {
+                    User user1 = userRepository.findByUserName(userName);
+                    if (user1 == null || user1.getUserId() == userId) {
+                        if ("普通用户".equals(userAreaVo.getUser().getUserRole())) {
+                            List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+                            if (userAreaList.size() > 0) {
                                 userAreaRepository.deleteByUserName(userName);
                             }
-                            User user=userAreaVo.getUser();
+                            User user = userAreaVo.getUser();
+                            user.setUserId(userId);
                             userRepository.save(user);
                             msg.setSuccess(true);
                             msg.setMsg("修改成功");
-                        }else {
-                            if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
-                                User user=userAreaVo.getUser();
+                        } else {
+                            if (userAreaVo.getAreaId() != null && !"".equals(userAreaVo.getAreaId())) {
+                                User user = userAreaVo.getUser();
+                                user.setUserId(userId);
                                 userRepository.save(user);
-                                List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
-                                if(userAreaList.size()>0){
+                                List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+                                if (userAreaList.size() > 0) {
                                     userAreaRepository.deleteByUserName(userName);
                                 }
-                                String[] areaId2=userAreaVo.getAreaId();//负责区域id
-                                for(int i=0;i<areaId2.length;i++){
-                                    Area area=areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
-                                    if(area!=null){
-                                        UserArea userArea=new UserArea();
+                                String[] areaId2 = userAreaVo.getAreaId();//负责区域id
+                                for (int i = 0; i < areaId2.length; i++) {
+                                    Area area = areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
+                                    if (area != null) {
+                                        UserArea userArea = new UserArea();
                                         userArea.setAreaId(Long.valueOf(areaId2[i]));
                                         userArea.setUserName(userName);
                                         userAreaRepository.save(userArea);
-                                    }else {
+                                    } else {
                                         msg.setMsg("负责区域不存在");
                                     }
                                 }
                                 msg.setSuccess(true);
                                 msg.setMsg("修改成功");
-                            }else {
+                            } else {
                                 msg.setMsg("负责区域不能为空");
                                 return msg;
                             }
                         }
-                    }else {
+                    } else {
                         msg.setMsg("域用户已存在");
                     }
-                }else {
+                } else {
                     msg.setMsg("所属区域不能为空");
                 }
-            }else {
+            } else {
                 msg.setMsg("域用户和角色不能为空");
             }
-        }catch (Exception e){
-            msg.setMsg("修改失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("修改失败" + e);
         }
         return msg;
     }
@@ -233,21 +240,20 @@ public class UserServiceImpl implements UserService {
     public Pager queryUser(Pager pager) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
-        Map<String,Object> parameters = pager.getParameters();
+        Map<String, Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
             String sql = "select cu.user_id as userId,ca.area_name as areaName," +
                     "cu.user_name as userName,cu.user_role as userRole from call_user cu " +
                     "left join call_area ca on cu.user_area_id=ca.area_id where 1=1";
-            if(parameters != null ){
-                Set<String> set=parameters.keySet();
-                for(String key:set)
-                {
-                    System.out.println(key+":"+parameters.get(key));
-                    sql = sql + " and " + propertyToField(key) + " like '%"+ parameters.get(key)+"%'";
+            if (parameters != null) {
+                Set<String> set = parameters.keySet();
+                for (String key : set) {
+                    System.out.println(key + ":" + parameters.get(key));
+                    sql = sql + " and " + propertyToField(key) + " like '%" + parameters.get(key) + "%'";
                 }
             }
-            if(orderBy != null){
+            if (orderBy != null) {
                 sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
             }
             if ((size != null && size != 0) && (page != null && page != 0)) {
@@ -258,11 +264,11 @@ public class UserServiceImpl implements UserService {
                 sql = sql + " limit 0,10";
             }
             List retVal = commonService.findInfoByNativeSQL(sql);
-            int pageCount=0;//总页数
-            int recordCount=retVal.size();//总记录数
-            if(recordCount % size==0){
+            int pageCount = 0;//总页数
+            int recordCount = retVal.size();//总记录数
+            if (recordCount % size == 0) {
                 pageCount = recordCount / size;
-            }else {
+            } else {
                 pageCount = recordCount / size + 1;
             }
             List<Map<String, Object>> listMap = new ArrayList<Map<String, Object>>();
@@ -272,9 +278,9 @@ public class UserServiceImpl implements UserService {
                     String userName = JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userName").toString();
                     map.put("userId", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userId"));
                     map.put("userAreaName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("areaName"));
-                    map.put("userName",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userName"));
-                    map.put("userRole",JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userRole"));
-                    List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
+                    map.put("userName", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userName"));
+                    map.put("userRole", JSONObject.parseObject(JSON.toJSONString(retVal.get(j))).get("userRole"));
+                    List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
                     if (userAreaList != null) {
                         String strAreaId[] = new String[userAreaList.size()];
                         List<Area> areaList = new ArrayList<Area>();
@@ -314,10 +320,14 @@ public class UserServiceImpl implements UserService {
     //根据Id查询用户
     @Override
     public Msg findByUserId(Long userId) {
-        Msg msg=new Msg(false,"查询失败!");
+        Msg msg = new Msg(false, "查询失败!");
         try {
-            User user=userRepository.findByUserId(userId);
-            List<UserArea> userAreaList=userAreaRepository.findByUserName(user.getUserName());
+            User user = userRepository.findByUserId(userId);
+            if (user == null) {
+                msg.setMsg("用户不存在!");
+                return msg;
+            }
+            List<UserArea> userAreaList = userAreaRepository.findByUserName(user.getUserName());
             Map map = new HashMap();
             if (userAreaList != null) {
                 List list = new ArrayList();
@@ -336,13 +346,13 @@ public class UserServiceImpl implements UserService {
                     }
                 }
                 map.put("areaId", permission);
-                map.put("user",user);
+                map.put("user", user);
             }
             msg.setObj(map);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
@@ -350,18 +360,18 @@ public class UserServiceImpl implements UserService {
     //查询所有用户
     @Override
     public Msg findAllUser() {
-        Msg msg=new Msg(false,"查询失败!");
+        Msg msg = new Msg(false, "查询失败!");
         try {
-            List<User> userList= (List<User>) userRepository.findAll();
-            if(userList==null){
+            List<User> userList = (List<User>) userRepository.findAll();
+            if (userList == null) {
                 msg.setMsg("用户不存在!");
                 return msg;
             }
             msg.setObj(userList);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
