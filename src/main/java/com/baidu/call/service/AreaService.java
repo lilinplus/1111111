@@ -18,4 +18,6 @@ public interface AreaService {
 
     Msg findAllArea();
 
+    Msg findAllAreaByUserName();//查询当前用户所拥有的区域
+
 }

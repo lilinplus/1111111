@@ -178,11 +178,11 @@ public class PhoneServiceImpl implements PhoneService {
         Msg msg=new Msg(false,"查询失败!");
         try {
             List<Phone> phoneList= (List<Phone>) phoneRepository.findAll();
-            List list=new ArrayList();
-            for(int i=0;i<phoneList.size();i++){
-                list.add(phoneList.get(i).getPhoneName());
+            if(phoneList==null){
+                msg.setMsg("分机号不存在!");
+                return msg;
             }
-            msg.setObj(list);
+            msg.setObj(phoneList);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
         }catch (Exception e){

@@ -358,11 +358,11 @@ public class UserServiceImpl implements UserService {
         Msg msg=new Msg(false,"查询失败!");
         try {
             List<User> userList= (List<User>) userRepository.findAll();
-            List list=new ArrayList();
-            for(int i=0;i<userList.size();i++){
-                list.add(userList.get(i).getUserName());
+            if(userList==null){
+                msg.setMsg("用户不存在!");
+                return msg;
             }
-            msg.setObj(list);
+            msg.setObj(userList);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
         }catch (Exception e){

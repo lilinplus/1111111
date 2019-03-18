@@ -96,4 +96,14 @@ public class AreaController {
         JsonUtils.writeJsonBySerializer(areaService.findAllArea(),response);
     }
 
+    /**
+     * 查询当前用户所拥有的区域
+     * @param response
+     */
+    @ApiOperation(value = "查询当前用户所拥有的区域", notes = "查询当前用户所拥有的区域")
+    @RequestMapping(value = "/call/findAllAreaByUserName", method = RequestMethod.GET)
+    public void findAllAreaByUserName(HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(areaService.findAllAreaByUserName(),response);
+    }
+
 }
