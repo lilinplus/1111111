@@ -245,25 +245,23 @@ public class GroupServiceImpl implements GroupService {
             List<GroupUser> groupUserList=groupUserRepository.findByGroupId(groupId);
             Map map = new HashMap();
             if (groupUserList != null) {
-                String strAreaId[] = new String[groupUserList.size()];
-                List<Group> groupList = new ArrayList<Group>();
+                List list = new ArrayList();
                 for (int p = 0; p < groupUserList.size(); p++) {
-                    strAreaId[p] = groupUserList.get(p).getUserName();
+                    String userName=groupUserList.get(p).getUserName();
+                    list.add(userName);
                 }
                 StringBuffer permission = new StringBuffer();
-                if (strAreaId.length > 0) {
-                    for (int m = 0; m < strAreaId.length; m++) {
+                if (list.size() > 0) {
+                    for (int m = 0; m < list.size(); m++) {
                         if (m == 0) {
-                            permission.append(strAreaId[0].toString());
+                            permission.append(list.get(0).toString());
                         } else {
-                            permission.append("," + strAreaId[m].toString());
+                            permission.append("," + list.get(m).toString());
                         }
                     }
                 }
-                map.put("member", permission);
-                map.put("groupId",group.getGroupId());
-                map.put("groupName",group.getGroupName());
-                map.put("groupPerson",group.getGroupPerson());
+                map.put("userName", permission);
+                map.put("group", group);
             }
             msg.setObj(map);
             msg.setSuccess(true);
