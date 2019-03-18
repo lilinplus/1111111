@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.aspectj.AbstractTransactionAspect;
+import org.w3c.dom.ls.LSInput;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -138,7 +139,7 @@ public class UserServiceImpl implements UserService {
                 return msg;
             }
             List<Group> group=groupRepository.findByGroupPerson(user.getUserName());
-            if(group!=null){
+            if(group.size()>0){
                 String groupName=group.get(0).getGroupName();
                 msg.setMsg(groupName+"分组指定人为该用户，不能删除");
                 return msg;
@@ -319,30 +320,23 @@ public class UserServiceImpl implements UserService {
             List<UserArea> userAreaList=userAreaRepository.findByUserName(user.getUserName());
             Map map = new HashMap();
             if (userAreaList != null) {
-                String strAreaId[] = new String[userAreaList.size()];
-                List<Area> areaList = new ArrayList<Area>();
+                List list = new ArrayList();
                 for (int p = 0; p < userAreaList.size(); p++) {
-                    Long riAreaId = userAreaList.get(p).getAreaId();
-                    Area area = areaRepository.findByAreaId(riAreaId);
-                    areaList.add(area);
-                    strAreaId[p] = area.getAreaName();
+                    Long areaId = userAreaList.get(p).getAreaId();
+                    list.add(areaId);
                 }
                 StringBuffer permission = new StringBuffer();
-                if (strAreaId.length > 0) {
-                    for (int m = 0; m < strAreaId.length; m++) {
+                if (list.size() > 0) {
+                    for (int m = 0; m < list.size(); m++) {
                         if (m == 0) {
-                            permission.append(strAreaId[0].toString());
+                            permission.append(list.get(0).toString());
                         } else {
-                            permission.append("," + strAreaId[m].toString());
+                            permission.append("," + list.get(m).toString());
                         }
                     }
                 }
-                Area area=areaRepository.findByAreaId(user.getUserAreaId());
-                map.put("areaName", permission);
-                map.put("userId",user.getUserId());
-                map.put("userName",user.getUserName());
-                map.put("userRole",user.getUserRole());
-                map.put("userAreaName",area.getAreaName());
+                map.put("areaId", permission);
+                map.put("user",user);
             }
             msg.setObj(map);
             msg.setSuccess(true);
