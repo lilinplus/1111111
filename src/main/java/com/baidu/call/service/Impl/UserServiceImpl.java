@@ -362,14 +362,33 @@ public class UserServiceImpl implements UserService {
     public Msg findAllUser() {
         Msg msg = new Msg(false, "查询失败!");
         try {
-            List<User> userList = (List<User>) userRepository.findAll();
-            if (userList == null) {
+            String userName=GetUuapUser.GetUser();
+            if(userName==null){
                 msg.setMsg("用户不存在!");
                 return msg;
             }
-            msg.setObj(userList);
-            msg.setSuccess(true);
-            msg.setMsg("查询成功!");
+            User user=userRepository.findByUserName(userName);
+            if("区域经理".equals(user.getUserRole())){
+                List<User> userList1=userRepository.findUserByUserRole();
+                if (userList1 == null) {
+                    msg.setMsg("用户不存在!");
+                    return msg;
+                }
+                msg.setObj(userList1);
+                msg.setSuccess(true);
+                msg.setMsg("查询成功!");
+            }else if("总经理".equals(user.getUserRole())){
+                List<User> userList = (List<User>) userRepository.findAll();
+                if (userList == null) {
+                    msg.setMsg("用户不存在!");
+                    return msg;
+                }
+                msg.setObj(userList);
+                msg.setSuccess(true);
+                msg.setMsg("查询成功!");
+            }else {
+                msg.setMsg("没有权限");
+            }
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
         }
