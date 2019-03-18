@@ -92,13 +92,23 @@ public class UserController {
     }
 
     /**
-     * 查询所有用户
+     * 根据当前用户角色查询用户
      * @param response
      */
-    @ApiOperation(value = "查询所有用户", notes = "查询所有用户")
+    @ApiOperation(value = "根据当前用户角色查询用户", notes = "根据当前用户角色查询用户")
     @RequestMapping(value = "/call/findAllUser", method = RequestMethod.GET)
     public void findAllUser(HttpServletResponse response){
         JsonUtils.writeJsonBySerializer(userService.findAllUser(),response);
+    }
+
+    /**
+     * 根据当前用户角色查询(组合)
+     * @param response
+     */
+    @ApiOperation(value = "根据当前用户角色查询(组合)", notes = "根据当前用户角色查询(组合)")
+    @RequestMapping(value = "/call/findAllUserByRole", method = RequestMethod.GET)
+    public void findAllUserByRole(HttpServletResponse response){
+        JsonUtils.writeJsonBySerializer(userService.findAllUserByRole(),response);
     }
 
 //    /**

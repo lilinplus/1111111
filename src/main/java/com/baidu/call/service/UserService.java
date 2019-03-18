@@ -20,6 +20,8 @@ public interface UserService {
 
     Msg findAllUser();
 
+    Msg findAllUserByRole();
+
 //    //域账户查询用户信息
 //    Msg getUserInfoOne(String userName);
 //

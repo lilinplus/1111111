@@ -357,7 +357,7 @@ public class UserServiceImpl implements UserService {
         return msg;
     }
 
-    //查询所有用户
+    //根据当前用户角色查询用户
     @Override
     public Msg findAllUser() {
         Msg msg = new Msg(false, "查询失败!");
@@ -388,6 +388,65 @@ public class UserServiceImpl implements UserService {
                 msg.setMsg("查询成功!");
             }else {
                 msg.setMsg("没有权限");
+            }
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
+        }
+        return msg;
+    }
+
+    //根据当前用户角色查询(组合)
+    @Override
+    public Msg findAllUserByRole() {
+        Msg msg = new Msg(false, "查询失败!");
+        try {
+             String userName=GetUuapUser.GetUser();
+            if(userName==null){
+                msg.setMsg("用户不存在!");
+                return msg;
+            }
+            User user=userRepository.findByUserName(userName);
+            if(user==null){
+                msg.setMsg("用户不存在!");
+                return msg;
+            }
+            if("区域经理".equals(user.getUserRole())){
+                List<Map> mapList=new ArrayList<>();
+                List<User> userList1=userRepository.findUserByUserRole();
+                if (userList1 == null) {
+                    msg.setMsg("用户不存在!");
+                    return msg;
+                }
+                for(int i=0;i<userList1.size();i++){
+                    Map map=new HashMap();
+                    map.put("value",userList1.get(i).getUserId());
+                    map.put("label",userList1.get(i).getUserName());
+                    map.put("checked",false);
+                    mapList.add(map);
+                }
+                msg.setObj(mapList);
+                msg.setSuccess(true);
+                msg.setMsg("查询成功!");
+            }else if("总经理".equals(user.getUserRole())){
+                List<Map> mapList=new ArrayList<>();
+                List<User> userList = (List<User>) userRepository.findAll();
+                if (userList == null) {
+                    msg.setMsg("用户不存在!");
+                    return msg;
+                }
+                for(int i=0;i<userList.size();i++){
+                    Map map=new HashMap();
+                    map.put("value",userList.get(i).getUserId());
+                    map.put("label",userList.get(i).getUserName());
+                    map.put("checked",false);
+                    mapList.add(map);
+                }
+                msg.setObj(mapList);
+                msg.setSuccess(true);
+                msg.setMsg("查询成功!");
+            }else {
+                msg.setMsg("没有权限");
+                msg.setSuccess(true);
             }
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
