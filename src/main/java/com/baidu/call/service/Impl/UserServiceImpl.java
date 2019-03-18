@@ -9,16 +9,16 @@ import com.baidu.call.service.CommonService;
 import com.baidu.call.service.UserService;
 import com.baidu.call.utils.GetUuapUser;
 import com.baidu.call.utils.Msg;
-import com.baidu.call.utils.SelectText;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import com.baidu.uic.ws.dto.UserDTO;
 import com.baidu.uic.ws.interfaces.IUserRemoteService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.aspectj.AbstractTransactionAspect;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
     //添加用户
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg addUser(UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "添加失败");
         try {
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
                     }else {
                         if(userAreaVo.getAreaId()!=null && !"".equals(userAreaVo.getAreaId())){
                             User user1=userRepository.findByUserName(userName);
-                            Long[] areaId2=userAreaVo.getAreaId();
+                            String[] areaId2=userAreaVo.getAreaId();
                             if(user1==null){
                                 User user=new User();
                                 user.setUserAreaId(areaId);
@@ -92,10 +92,10 @@ public class UserServiceImpl implements UserService {
                                 user.setUserRole(role);
                                 userRepository.save(user);
                                 for(int i=0;i<areaId2.length;i++){
-                                    Area area=areaRepository.findByAreaId(areaId2[i]);
+                                    Area area=areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
                                     if(area!=null){
                                         UserArea userArea=new UserArea();
-                                        userArea.setAreaId(areaId2[i]);
+                                        userArea.setAreaId(Long.valueOf(areaId2[i]));
                                         userArea.setUserName(userName);
                                         userAreaRepository.save(userArea);
                                     }else {
@@ -121,6 +121,7 @@ public class UserServiceImpl implements UserService {
             }
         }catch (Exception e){
             msg.setMsg("添加失败"+e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
@@ -192,12 +193,12 @@ public class UserServiceImpl implements UserService {
                                 if(userAreaList.size()>0){
                                     userAreaRepository.deleteByUserName(userName);
                                 }
-                                Long[] areaId2=userAreaVo.getAreaId();//负责区域id
+                                String[] areaId2=userAreaVo.getAreaId();//负责区域id
                                 for(int i=0;i<areaId2.length;i++){
-                                    Area area=areaRepository.findByAreaId(areaId2[i]);
+                                    Area area=areaRepository.findByAreaId(Long.valueOf(areaId2[i]));
                                     if(area!=null){
                                         UserArea userArea=new UserArea();
-                                        userArea.setAreaId(areaId2[i]);
+                                        userArea.setAreaId(Long.valueOf(areaId2[i]));
                                         userArea.setUserName(userName);
                                         userAreaRepository.save(userArea);
                                     }else {

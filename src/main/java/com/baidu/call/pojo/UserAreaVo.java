@@ -15,6 +15,6 @@ public class UserAreaVo {
 //    private String userRole;//角色
     private User user;
 
-    private Long [] areaId;//负责区域Id
+    private String [] areaId;//负责区域Id
 
 }
