@@ -110,11 +110,9 @@ public class PhoneUserServiceImpl implements PhoneUserService {
         Map<String,Object> parameters = pager.getParameters();
         List<com.baidu.call.utils.page.dtgrid.Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String sql = "SELECT cpu.phone_user_id phoneUserId,cu.user_name userName," +
-                    "cp.phone_name phoneName,cpu.phone_starttime phoneStarttime," +
-                    "cpu.phone_endtime phoneEndtime FROM call_phone_user cpu INNER JOIN " +
-                    "call_phone cp ON cpu.phone_num_id=cp.phone_id INNER JOIN call_user cu ON " +
-                    "cpu.user_name=cu.user_name WHERE 1=1";
+            String sql = "SELECT cp.phone_user_id phoneUserId,cp.phone_name phoneName," +
+                    "cp.user_name userName,cp.phone_starttime phoneStarttime," +
+                    "cp.phone_endtime phoneEndtime from call_phone_user cp WHERE 1=1";
             if(parameters != null ){
                 Set<String> set=parameters.keySet();
                 for(String key:set)
