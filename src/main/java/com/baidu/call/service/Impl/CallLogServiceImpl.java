@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.baidu.call.utils.PropertyFieldConvertor.propertyToField;
 
@@ -191,24 +188,32 @@ public class CallLogServiceImpl implements CallLogService {
     //查询当前用户负责的区域
     @Override
     public Msg queryUserArea() {
-        Msg msg = new Msg();
+        Msg msg = new Msg(false, "查询失败!");
         try {
             String userName = GetUuapUser.GetUser();//获取当前用户
             if (userName == null) {
+                msg.setMsg("用户不存在!");
                 return msg;
             }
             List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
-            if (userAreaList == null) {
+            if (userAreaList.size() == 0) {
+                msg.setMsg("当前用户没有负责区域!");
                 return msg;
             }
+
             List list = new ArrayList();
             for (int i = 0; i < userAreaList.size(); i++) {
                 Long areaId = userAreaList.get(i).getAreaId();
                 Area area = areaRepository.findByAreaId(areaId);
                 String areaName = area.getAreaName();
-                list.add(areaName);
+                Map map = new HashMap();
+                map.put("areaId", areaId);
+                map.put("areaName", areaName);
+                list.add(map);
             }
             msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
         }
@@ -218,21 +223,30 @@ public class CallLogServiceImpl implements CallLogService {
     //查询该区域下所有用户
     @Override
     public Msg queryAreaMember(String areaName) {
-        Msg msg = new Msg();
+        Msg msg = new Msg(false, "查询失败!");
         try {
             Area area = areaRepository.findByAreaName(areaName);
             if (area == null) {
+                msg.setMsg("区域不存在!");
                 return msg;
             }
             List<User> user = userRepository.findByUserAreaId(area.getAreaId());
-            if (user == null) {
+            if (user.size() == 0) {
+                msg.setMsg("该区域下没有用户!");
                 return msg;
             }
             List list = new ArrayList();
             for (int i = 0; i < user.size(); i++) {
-                list.add(user.get(i).getUserName());
+                String userName = user.get(i).getUserName();
+                Long userId = user.get(i).getUserId();
+                Map map = new HashMap();
+                map.put("userId", userId);
+                map.put("userName", userName);
+                list.add(map);
             }
             msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
         }
@@ -242,21 +256,30 @@ public class CallLogServiceImpl implements CallLogService {
     //查询当前用户负责的组
     @Override
     public Msg queryUserGroup() {
-        Msg msg = new Msg();
+        Msg msg = new Msg(false, "查询失败!");
         try {
             String userName = GetUuapUser.GetUser();//获取当前用户
             if (userName == null) {
+                msg.setMsg("用户不存在!");
                 return msg;
             }
             List<Group> groupList = groupRepository.findByGroupPerson(userName);
-            if (groupList == null) {
+            if (groupList.size() == 0) {
+                msg.setMsg("该用户没有指定负责的分组!");
                 return msg;
             }
             List list = new ArrayList();
             for (int i = 0; i < groupList.size(); i++) {
-                list.add(groupList.get(i).getGroupName());
+                String groupName = groupList.get(i).getGroupName();
+                Long groupId = groupList.get(i).getGroupId();
+                Map map = new HashMap();
+                map.put("groupId", groupId);
+                map.put("groupName", groupName);
+                list.add(map);
             }
             msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
         }
@@ -266,21 +289,34 @@ public class CallLogServiceImpl implements CallLogService {
     //查询分组成员
     @Override
     public Msg queryGroupMember(String groupName) {
-        Msg msg = new Msg();
+        Msg msg = new Msg(false,"查询失败!");
         try {
             Group group = groupRepository.findByGroupName(groupName);
             if (group == null) {
+                msg.setMsg("分组不存在!");
                 return msg;
             }
             List<GroupUser> groupUserList = groupUserRepository.findByGroupId(group.getGroupId());
-            if (groupUserList == null) {
+            if (groupUserList.size() == 0) {
+                msg.setMsg("该分组下没有成员!");
                 return msg;
             }
             List list = new ArrayList();
             for (int i = 0; i < groupUserList.size(); i++) {
-                list.add(groupUserList.get(i).getUserName());
+                String userName = groupUserList.get(i).getUserName();
+                if(userName == null){
+                    msg.setMsg("用户不存在!");
+                    return msg;
+                }
+                User user = userRepository.findByUserName(userName);
+                Map map = new HashMap();
+                map.put("userId",user.getUserId());
+                map.put("userName",userName);
+                list.add(map);
             }
             msg.setObj(list);
+            msg.setSuccess(true);
+            msg.setMsg("查询成功!");
         } catch (Exception e) {
             msg.setMsg("查询失败" + e);
         }

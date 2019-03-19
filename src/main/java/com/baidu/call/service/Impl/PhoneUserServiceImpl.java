@@ -35,11 +35,12 @@ public class PhoneUserServiceImpl implements PhoneUserService {
         Msg msg = new Msg(false,"添加失败");
         try {
             String userName=phoneUser.getUserName();
-            String phoneName=phoneUser.getPhoneName();//话机名
+            String phoneName=phoneUser.getPhoneName().trim();//话机名
             Long phoneStarttime=phoneUser.getPhoneStarttime();
             Long phoneEndtime=phoneUser.getPhoneEndtime();
             if(userName!=null && !"".equals(userName) && phoneName!=null && !"".equals(phoneName) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
                 if(phoneEndtime>phoneStarttime){
+                    phoneUser.setPhoneName(phoneName);
                     phoneUserRepository.save(phoneUser);
                     msg.setSuccess(true);
                     msg.setMsg("添加成功");
