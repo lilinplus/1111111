@@ -1,8 +1,6 @@
 package com.baidu.call.service.Impl;
 
-import com.baidu.call.model.Phone;
 import com.baidu.call.model.PhoneUser;
-import com.baidu.call.repository.PhoneRepository;
 import com.baidu.call.repository.PhoneUserRepository;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.PhoneUserService;
@@ -14,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,22 +29,23 @@ public class PhoneUserServiceImpl implements PhoneUserService {
     @Autowired
     private PhoneUserRepository phoneUserRepository;
 
-    @Autowired
-    private PhoneRepository phoneRepository;
-
     //添加用户使用话机的时间段
     @Override
     public Msg addPhoneUser(PhoneUser phoneUser) {
         Msg msg = new Msg(false,"添加失败");
         try {
             String userName=phoneUser.getUserName();
-            Long phoneNumId=phoneUser.getPhoneNumId();
+            String phoneName=phoneUser.getPhoneName();//话机名
             Long phoneStarttime=phoneUser.getPhoneStarttime();
             Long phoneEndtime=phoneUser.getPhoneEndtime();
-            if(userName!=null && !"".equals(userName) && phoneNumId!=null && !"".equals(phoneNumId) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
-                phoneUserRepository.save(phoneUser);
-                msg.setSuccess(true);
-                msg.setMsg("添加成功");
+            if(userName!=null && !"".equals(userName) && phoneName!=null && !"".equals(phoneName) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
+                if(phoneEndtime>phoneStarttime){
+                    phoneUserRepository.save(phoneUser);
+                    msg.setSuccess(true);
+                    msg.setMsg("添加成功");
+                }else {
+                    msg.setMsg("结束时间不能早于开始时间!");
+                }
             }else {
                 msg.setMsg("文本框不能为空");
             }
@@ -92,10 +90,10 @@ public class PhoneUserServiceImpl implements PhoneUserService {
             return msg;
         }
         String userName=phoneUser.getUserName();
-        Long phoneNumId=phoneUser.getPhoneNumId();
+        String phoneName=phoneUser.getPhoneName();
         Long phoneStarttime=phoneUser.getPhoneStarttime();
         Long phoneEndtime=phoneUser.getPhoneEndtime();
-        if(userName!=null && !"".equals(userName) && phoneNumId!=null && !"".equals(phoneNumId) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
+        if(userName!=null && !"".equals(userName) && phoneName!=null && !"".equals(phoneName) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
             phoneUserRepository.save(phoneUser);
             msg.setSuccess(true);
             msg.setMsg("更新成功");
@@ -161,14 +159,11 @@ public class PhoneUserServiceImpl implements PhoneUserService {
         Msg msg=new Msg(false,"查询失败!");
         try {
             PhoneUser phoneUser=phoneUserRepository.findByPhoneUserId(phoneUserId);
-            Phone phone=phoneRepository.findByPhoneId(phoneUser.getPhoneNumId());
-            Map map = new HashMap();
-            map.put("phoneUserId",phoneUser.getPhoneUserId());
-            map.put("userName",phoneUser.getUserName());
-            map.put("phoneStarttime",phoneUser.getPhoneStarttime());
-            map.put("phoneEndtime",phoneUser.getPhoneEndtime());
-            map.put("phoneName",phone.getPhoneName());
-            msg.setObj(map);
+            if(phoneUser==null){
+                msg.setMsg("信息不存在!");
+                return msg;
+            }
+            msg.setObj(phoneUser);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
         }catch (Exception e){

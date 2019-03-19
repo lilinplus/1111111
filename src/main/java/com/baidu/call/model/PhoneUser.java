@@ -21,9 +21,9 @@ public class PhoneUser {
     @ApiModelProperty(value = "域用户名")
     private String userName;//域用户名
 
-    @Column(name = "phone_num_id")
-    @ApiModelProperty(value = "话机id")
-    private Long phoneNumId;//话机id
+    @Column(name = "phone_name")
+    @ApiModelProperty(value = "话机名")
+    private String phoneName;//话机名
 
     @Column(name = "phone_starttime")
     @ApiModelProperty(value = "开始时间")

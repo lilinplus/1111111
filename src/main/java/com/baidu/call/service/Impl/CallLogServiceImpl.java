@@ -41,9 +41,6 @@ public class CallLogServiceImpl implements CallLogService {
     private PhoneUserRepository phoneUserRepository;
 
     @Autowired
-    private PhoneRepository phoneRepository;
-
-    @Autowired
     private GroupRepository groupRepository;
 
     @Autowired
@@ -57,37 +54,44 @@ public class CallLogServiceImpl implements CallLogService {
     public Pager queryCallLog(Pager pager) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
-        Map<String,Object> parameters = pager.getParameters();
+        Map<String, Object> parameters = pager.getParameters();
         List<Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            String userName= GetUuapUser.GetUser();
-            if(userName==null){
+            String userName = GetUuapUser.GetUser();
+            if (userName == null) {
                 return pager;
             }
-            User user=userRepository.findByUserName(userName);
-            if(user==null){
+            User user = userRepository.findByUserName(userName);
+            if (user == null) {
                 return pager;
             }
 
-            String sql="SELECT * FROM t_call_log WHERE 1=1 ";
-            List<PhoneUser> phoneUserList=phoneUserRepository.findByUserName(user.getUserName());
-            for(int i=0;i<phoneUserList.size();i++){
-                Long starttime=phoneUserList.get(i).getPhoneStarttime();
-                Long endtime=phoneUserList.get(i).getPhoneEndtime();
-                sql=sql+"and unix_timestamp(start_time)>= "+starttime+" and unix_timestamp(end_time)<= "+endtime ;
-                if(phoneUserList.size()-i>1){
-                    sql=sql+" or ";
+            String sql = "SELECT * FROM t_call_log WHERE 1=1 ";
+            List<PhoneUser> phoneUserList = phoneUserRepository.findByUserName(user.getUserName());
+            for (int i = 0; i < phoneUserList.size(); i++) {
+                Long starttime = phoneUserList.get(i).getPhoneStarttime();
+                Long endtime = phoneUserList.get(i).getPhoneEndtime();
+                sql = sql + "and unix_timestamp(start_time)>= " + starttime + " and unix_timestamp(end_time)<= " + endtime;
+                if (phoneUserList.size() - i > 1) {
+                    sql = sql + " or ";
                 }
             }
 
-            if(parameters != null ){
-                Set<String> set=parameters.keySet();
-                for(String key:set)
-                {
-                    sql = sql + " and " + propertyToField(key) + " like '%"+ parameters.get(key)+"%'";
+            for (int j = 0; j < phoneUserList.size(); j++) {
+                String phoneName = phoneUserList.get(j).getPhoneName();
+                sql = sql + " and phone_name = " + phoneName;
+                if (phoneUserList.size() - j > 1) {
+                    sql = sql + " or ";
                 }
             }
-            if(orderBy != null){
+
+            if (parameters != null) {
+                Set<String> set = parameters.keySet();
+                for (String key : set) {
+                    sql = sql + " and " + propertyToField(key) + " like '%" + parameters.get(key) + "%'";
+                }
+            }
+            if (orderBy != null) {
                 sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
             }
             if ((size != null && size != 0) && (page != null && page != 0)) {
@@ -98,11 +102,11 @@ public class CallLogServiceImpl implements CallLogService {
                 sql = sql + " limit 0,10";
             }
             List retVal = commonService.findInfoByNativeSQL(sql);
-            int pageCount=0;//总页数
-            int recordCount=retVal.size();//总记录数
-            if(recordCount % size==0){
+            int pageCount = 0;//总页数
+            int recordCount = retVal.size();//总记录数
+            if (recordCount % size == 0) {
                 pageCount = recordCount / size;
-            }else {
+            } else {
                 pageCount = recordCount / size + 1;
             }
             pager.setExhibitDatas(retVal);
@@ -122,36 +126,39 @@ public class CallLogServiceImpl implements CallLogService {
     public Pager queryUserCallLog(Pager pager, String userName) {
         Integer page = pager.getNowPage();
         Integer size = pager.getPageSize();
-        Map<String,Object> parameters = pager.getParameters();
+        Map<String, Object> parameters = pager.getParameters();
         List<Sort> orderBy = pager.getAdvanceQuerySorts();
         try {
-            if(userName==null){
+            if (userName == null) {
                 return pager;
             }
-            User user=userRepository.findByUserName(userName);
-            if(user==null){
+            User user = userRepository.findByUserName(userName);
+            if (user == null) {
                 return pager;
             }
 
-            String sql="SELECT * FROM t_call_log WHERE 1=1 ";
-            List<PhoneUser> phoneUserList=phoneUserRepository.findByUserName(user.getUserName());
-            for(int i=0;i<phoneUserList.size();i++){
-                Long starttime=phoneUserList.get(i).getPhoneStarttime();
-                Long endtime=phoneUserList.get(i).getPhoneEndtime();
-                sql=sql+"and unix_timestamp(start_time)>= "+starttime+" and unix_timestamp(end_time)<= "+endtime ;
-                if(phoneUserList.size()-i>1){
-                    sql=sql+" or ";
+            String sql = "SELECT * FROM t_call_log WHERE 1=1 ";
+            List<PhoneUser> phoneUserList = phoneUserRepository.findByUserName(user.getUserName());
+            for (int i = 0; i < phoneUserList.size(); i++) {
+                Long starttime = phoneUserList.get(i).getPhoneStarttime();
+                Long endtime = phoneUserList.get(i).getPhoneEndtime();
+                String phoneName = phoneUserList.get(i).getPhoneName();
+                if (i == 0) {
+                    sql = sql + " and ";
+                }
+                sql = sql + " unix_timestamp(start_time)>= " + starttime + " and unix_timestamp(end_time)<= " + endtime + " and call_src = " + phoneName;
+                if (phoneUserList.size() - i > 1) {
+                    sql = sql + " or ";
                 }
             }
 
-            if(parameters != null ){
-                Set<String> set=parameters.keySet();
-                for(String key:set)
-                {
-                    sql = sql + " and " + propertyToField(key) + " like '%"+ parameters.get(key)+"%'";
+            if (parameters != null) {
+                Set<String> set = parameters.keySet();
+                for (String key : set) {
+                    sql = sql + " and " + propertyToField(key) + " like '%" + parameters.get(key) + "%'";
                 }
             }
-            if(orderBy != null){
+            if (orderBy != null) {
                 sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
             }
             if ((size != null && size != 0) && (page != null && page != 0)) {
@@ -162,11 +169,11 @@ public class CallLogServiceImpl implements CallLogService {
                 sql = sql + " limit 0,10";
             }
             List retVal = commonService.findInfoByNativeSQL(sql);
-            int pageCount=0;//总页数
-            int recordCount=retVal.size();//总记录数
-            if(recordCount % size==0){
+            int pageCount = 0;//总页数
+            int recordCount = retVal.size();//总记录数
+            if (recordCount % size == 0) {
                 pageCount = recordCount / size;
-            }else {
+            } else {
                 pageCount = recordCount / size + 1;
             }
             pager.setExhibitDatas(retVal);
@@ -186,24 +193,24 @@ public class CallLogServiceImpl implements CallLogService {
     public Msg queryUserArea() {
         Msg msg = new Msg();
         try {
-            String userName= GetUuapUser.GetUser();//获取当前用户
-            if(userName==null){
+            String userName = GetUuapUser.GetUser();//获取当前用户
+            if (userName == null) {
                 return msg;
             }
-            List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
-            if(userAreaList==null){
+            List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+            if (userAreaList == null) {
                 return msg;
             }
-            List list=new ArrayList();
-            for(int i=0;i<userAreaList.size();i++){
-                Long areaId=userAreaList.get(i).getAreaId();
-                Area area=areaRepository.findByAreaId(areaId);
-                String areaName=area.getAreaName();
+            List list = new ArrayList();
+            for (int i = 0; i < userAreaList.size(); i++) {
+                Long areaId = userAreaList.get(i).getAreaId();
+                Area area = areaRepository.findByAreaId(areaId);
+                String areaName = area.getAreaName();
                 list.add(areaName);
             }
             msg.setObj(list);
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
@@ -213,21 +220,21 @@ public class CallLogServiceImpl implements CallLogService {
     public Msg queryAreaMember(String areaName) {
         Msg msg = new Msg();
         try {
-            Area area=areaRepository.findByAreaName(areaName);
-            if(area==null){
+            Area area = areaRepository.findByAreaName(areaName);
+            if (area == null) {
                 return msg;
             }
-            List<User> user=userRepository.findByUserAreaId(area.getAreaId());
-            if(user==null){
+            List<User> user = userRepository.findByUserAreaId(area.getAreaId());
+            if (user == null) {
                 return msg;
             }
-            List list=new ArrayList();
-            for(int i=0;i<user.size();i++){
+            List list = new ArrayList();
+            for (int i = 0; i < user.size(); i++) {
                 list.add(user.get(i).getUserName());
             }
             msg.setObj(list);
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
@@ -237,21 +244,21 @@ public class CallLogServiceImpl implements CallLogService {
     public Msg queryUserGroup() {
         Msg msg = new Msg();
         try {
-            String userName= GetUuapUser.GetUser();//获取当前用户
-            if(userName==null){
+            String userName = GetUuapUser.GetUser();//获取当前用户
+            if (userName == null) {
                 return msg;
             }
-            List<Group> groupList=groupRepository.findByGroupPerson(userName);
-            if(groupList==null){
+            List<Group> groupList = groupRepository.findByGroupPerson(userName);
+            if (groupList == null) {
                 return msg;
             }
-            List list=new ArrayList();
-            for(int i=0;i<groupList.size();i++){
+            List list = new ArrayList();
+            for (int i = 0; i < groupList.size(); i++) {
                 list.add(groupList.get(i).getGroupName());
             }
             msg.setObj(list);
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
@@ -259,23 +266,23 @@ public class CallLogServiceImpl implements CallLogService {
     //查询分组成员
     @Override
     public Msg queryGroupMember(String groupName) {
-        Msg msg=new Msg();
+        Msg msg = new Msg();
         try {
-            Group group=groupRepository.findByGroupName(groupName);
-            if(group==null){
+            Group group = groupRepository.findByGroupName(groupName);
+            if (group == null) {
                 return msg;
             }
-            List<GroupUser> groupUserList=groupUserRepository.findByGroupId(group.getGroupId());
-            if(groupUserList==null){
+            List<GroupUser> groupUserList = groupUserRepository.findByGroupId(group.getGroupId());
+            if (groupUserList == null) {
                 return msg;
             }
-            List list=new ArrayList();
-            for(int i=0;i<groupUserList.size();i++){
+            List list = new ArrayList();
+            for (int i = 0; i < groupUserList.size(); i++) {
                 list.add(groupUserList.get(i).getUserName());
             }
             msg.setObj(list);
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
