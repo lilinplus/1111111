@@ -8,7 +8,6 @@ import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.page.dtgrid.Pager;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +29,11 @@ public class CallLogController {
     private CallLogRepository callLogRepository;
 
     /**
-     * 查询当前用户录音信息
+     * 查询用户录音信息
      * @param pager
      * @param response
      */
-    @ApiOperation(value = "查询当前用户录音信息", notes = "查询当前用户录音信息")
+    @ApiOperation(value = "查询用户录音信息", notes = "查询用户录音信息")
     @ApiImplicitParam(name = "pager", value = "pager", dataType = "Pager")
     @RequestMapping(value = "/call/selectCallLog", method = RequestMethod.GET)
     public void queryCallLog(Pager pager, HttpServletResponse response){
@@ -47,15 +46,15 @@ public class CallLogController {
      * @param userName
      * @param response
      */
-    @ApiOperation(value = "查询用户录音信息", notes = "查询用户录音信息")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "pager", name = "pager", dataType = "Pager"),
-            @ApiImplicitParam(value = "userName", name = "userName", dataType = "String",paramType = "path")
-    })
-    @RequestMapping(value = "/call/selectCallLog/{userName}", method = RequestMethod.GET)
-    public void queryUserCallLog(Pager pager,@PathVariable String userName, HttpServletResponse response){
-        JsonUtils.writeJsonBySerializer(callLogService.queryUserCallLog(pager,userName),response);
-    }
+//    @ApiOperation(value = "查询用户录音信息", notes = "查询用户录音信息")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "pager", name = "pager", dataType = "Pager"),
+//            @ApiImplicitParam(value = "userName", name = "userName", dataType = "String",paramType = "path")
+//    })
+//    @RequestMapping(value = "/call/selectCallLog/{userName}", method = RequestMethod.GET)
+//    public void queryUserCallLog(Pager pager,@PathVariable String userName, HttpServletResponse response){
+//        JsonUtils.writeJsonBySerializer(callLogService.queryUserCallLog(pager,userName),response);
+//    }
 
     /**
      * 查询当前用户负责的区域

@@ -5,9 +5,9 @@ import com.baidu.call.utils.page.dtgrid.Pager;
 
 public interface CallLogService {
 
-    Pager queryCallLog(Pager pager);//查询当前用户录音信息
+    Pager queryCallLog(Pager pager);//查询用户录音信息
 
-    Pager queryUserCallLog(Pager pager,String userName);//查询用户录音信息
+    //Pager queryUserCallLog(Pager pager,String userName);//查询用户录音信息
 
     Msg queryUserArea();//查询当前用户负责的区域
 
