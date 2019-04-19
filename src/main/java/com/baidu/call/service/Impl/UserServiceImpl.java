@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
             Long areaId = userAreaVo.getUser().getUserAreaId();//所在区域Id
             UserDTO userDTO = uicUserRemoteService.getUserByUsername(userName);
             if (userDTO == null) {
-                msg.setMsg("域用户错误!");
+                msg.setMsg("域用户不存在!");
                 return msg;
             }
             if (userName != null && !"".equals(userName) && role != null && !"".equals(role)) {
@@ -465,20 +465,12 @@ public class UserServiceImpl implements UserService {
                 return msg;
             }
             User localUser = userRepository.findByUserName(username);
-            if (localUser == null) {
-                UserDTO userDTO = uicUserRemoteService.getUserByUsername(username);
-                if (userDTO != null) {
-                    User user = new User();
-                    user.setUserName(userDTO.getUsername());
-                    localUser = userRepository.save(user);
-                    msg.setSuccess(true);
-                    msg.setObj(localUser);
-                    msg.setMsg("用户信息获取成功!");
-                }
-            } else {
+            if (localUser != null) {
                 msg.setSuccess(true);
                 msg.setObj(localUser);
                 msg.setMsg("用户信息获取成功!");
+            } else {
+                msg.setMsg("该用户没有权限!");
             }
         } catch (Exception e) {
             logger.error(e);
