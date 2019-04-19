@@ -55,7 +55,7 @@ spring:
   mvc:
     static-path-pattern: /**
   resources:
-    static-locations: file:///D:/WorkSpace/dist/RQ/
+    static-locations: file:///D:/WorkSpace/dist/
 #指定日志配置文件，如不指定则按照 log4j2-test log4j2的顺序加载
 logging:
   config: classpath:log4j2.xml
@@ -63,7 +63,7 @@ logging:
 cas:
   casServerUrlPrefix: https://itebeta.baidu.com
   casServerLoginUrl: https://itebeta.baidu.com/login
-  serverName: http://localhost:8121
+  serverName: localhost:8121
   encoding: UTF-8
   urlPatterns: /*
 web:

@@ -9,8 +9,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import static com.baidu.call.utils.ReadConfig.readConfigByPath;
-
 /**
  * Created by chenyafei01_sh on 2018/1/5.
  */
@@ -26,9 +24,10 @@ public class GetUuapUser {
             Assertion assertion = (Assertion) session.getAttribute("_const_cas_assertion_");
             logger.error("GetUuapUser --- uuap login info :" + assertion);
             if (assertion == null) {
-                  username = readConfigByPath("///usr/local/call/LoginUser.properties", "username");
+                  //username = readConfigByPath("///usr/local/call/LoginUser.properties", "username");
 //                username = readConfigByPath("D:\\dist\\LoginUser.properties", "username");
-//                username = "zhuweidong";
+                username = "v_gaochuang";
+//                username = null;
             } else {
                 username = assertion.getPrincipal().getName();
             }
