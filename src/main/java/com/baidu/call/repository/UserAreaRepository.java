@@ -9,6 +9,8 @@ public interface UserAreaRepository extends CrudRepository<UserArea,Long> {
 
     void deleteByUserName(String userName);
 
+    void deleteByAreaId(Long areaId);
+
     List<UserArea> findByUserName(String userName);
 
     List<UserArea> findByAreaId(Long areaId);

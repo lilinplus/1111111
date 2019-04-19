@@ -6,9 +6,9 @@ spring:
   profiles: dev
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/call?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
-    username: root
-    password: 123456
+    url: jdbc:mysql://172.16.207.133:8006/zycoo_coovox?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
+    username: test
+    password: test
     driver-class-name: com.mysql.jdbc.Driver
 # 下面为连接池的补充设置，应用到上面所有数据源中
 # 初始化大小，最小，最大
@@ -55,7 +55,7 @@ spring:
   mvc:
     static-path-pattern: /**
   resources:
-    static-locations: classpath:/static/
+    static-locations: file:///D:/WorkSpace/dist/RQ/
 #指定日志配置文件，如不指定则按照 log4j2-test log4j2的顺序加载
 logging:
   config: classpath:log4j2.xml

@@ -17,4 +17,7 @@ public interface UserRepository extends CrudRepository<User,Long> {
     @Query(value = "select cu from User cu where cu.userRole='普通用户'")
     List<User> findUserByUserRole();
 
+    @Query(value = "select cu from User cu where cu.userRole='总经理'")
+    List<User> findByUserRole();
+
 }

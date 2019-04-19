@@ -3,9 +3,11 @@ package com.baidu.call.service.Impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.call.model.Area;
+import com.baidu.call.model.User;
 import com.baidu.call.model.UserArea;
 import com.baidu.call.repository.AreaRepository;
 import com.baidu.call.repository.UserAreaRepository;
+import com.baidu.call.repository.UserRepository;
 import com.baidu.call.service.AreaService;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.utils.GetUuapUser;
@@ -16,6 +18,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.aspectj.AbstractTransactionAspect;
 
 import java.util.*;
 
@@ -33,10 +38,14 @@ public class AreaServiceImpl implements AreaService {
     private AreaRepository areaRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private UserAreaRepository userAreaRepository;
 
     //添加区域
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg addArea(Area area) {
         Msg msg = new Msg(false, "添加失败");
         try {
@@ -45,6 +54,19 @@ public class AreaServiceImpl implements AreaService {
                 if (area1 == null) {
                     area.setAreaCreatetime(new Date().getTime());
                     areaRepository.save(area);
+                    List<User> userList = userRepository.findByUserRole();
+                    if(userList!=null){
+                        List<Area> areaList = (List<Area>) areaRepository.findAll();
+                        for(int i=0;i<userList.size();i++){
+                            userAreaRepository.deleteByUserName(userList.get(i).getUserName());
+                            for(int a=0;a<areaList.size();a++){
+                                UserArea userArea = new UserArea();
+                                userArea.setUserName(userList.get(i).getUserName());
+                                userArea.setAreaId(areaList.get(a).getAreaId());
+                                userAreaRepository.save(userArea);
+                            }
+                        }
+                    }
                     msg.setSuccess(true);
                     msg.setMsg("添加成功");
                 } else {
@@ -57,12 +79,14 @@ public class AreaServiceImpl implements AreaService {
             }
         } catch (Exception e) {
             msg.setMsg("添加失败" + e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
 
     //删除区域
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg deleteArea(Long areaId) {
         Msg msg = new Msg(false, "删除失败");
         try {
@@ -71,22 +95,20 @@ public class AreaServiceImpl implements AreaService {
                 msg.setMsg("信息不存在");
                 return msg;
             }
-            List<UserArea> userAreaList = userAreaRepository.findByAreaId(areaId);
-            if (userAreaList.size() > 0) {
-                msg.setMsg("此区域有引用，不能删除");
-                return msg;
-            }
+            userAreaRepository.deleteByAreaId(areaId);
             areaRepository.deleteById(areaId);
             msg.setSuccess(true);
             msg.setMsg("删除成功");
         } catch (Exception e) {
             msg.setMsg("删除失败" + e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
 
     //修改区域信息
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg updateArea(Long areaId, Area area) {
         Msg msg = new Msg(false, "修改失败");
         try {
@@ -117,6 +139,7 @@ public class AreaServiceImpl implements AreaService {
             }
         } catch (Exception e) {
             msg.setMsg("修改失败" + e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
@@ -217,25 +240,30 @@ public class AreaServiceImpl implements AreaService {
     public Msg findAllAreaByUserName() {
         Msg msg = new Msg(false, "查询失败!");
         try {
-            String userName= GetUuapUser.GetUser();
-            List<UserArea> userAreaList=userAreaRepository.findByUserName(userName);
-            if(userAreaList==null){
+            String userName = GetUuapUser.GetUser();
+            if(userName==null){
+                msg.setMsg("用户不存在");
+                return msg;
+            }
+            List<UserArea> userAreaList = userAreaRepository.findByUserName(userName);
+            if (userAreaList == null) {
                 msg.setMsg("区域不存在!");
                 return msg;
             }
-            List<Map<String,Object>> mapList= new ArrayList<>();
-            for(int i=0;i<userAreaList.size();i++){
-                Area area=areaRepository.findByAreaId(userAreaList.get(i).getAreaId());
-                Map map=new HashMap();
-                map.put("areaName",area.getAreaName());
-                map.put("id",userAreaList.get(i).getAreaId());
+            List<Map<String, Object>> mapList = new ArrayList<>();
+            for (int i = 0; i < userAreaList.size(); i++) {
+                Area area = areaRepository.findByAreaId(userAreaList.get(i).getAreaId());
+                Map map = new HashMap();
+
+                map.put("areaName", area.getAreaName());
+                map.put("id", userAreaList.get(i).getAreaId());
                 mapList.add(map);
             }
             msg.setObj(mapList);
             msg.setSuccess(true);
             msg.setMsg("查询成功!");
-        }catch (Exception e){
-            msg.setMsg("查询失败"+e);
+        } catch (Exception e) {
+            msg.setMsg("查询失败" + e);
         }
         return msg;
     }
