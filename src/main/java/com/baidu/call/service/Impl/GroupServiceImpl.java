@@ -17,7 +17,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.aspectj.AbstractTransactionAspect;
 
 import java.util.*;
 
@@ -41,21 +43,29 @@ public class GroupServiceImpl implements GroupService {
     private UserRepository userRepository;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg addGroup(GroupUserVo groupUserVo) {
         Msg msg = new Msg(false, "添加失败");
         try{
-            String groupName=groupUserVo.getGroup().getGroupName();
-            String groupPerson=groupUserVo.getGroup().getGroupPerson();
+            Group group=groupUserVo.getGroup();
+            if(group == null){
+                msg.setMsg("分组名和指定人不能为空");
+                return msg;
+            }
             String[] userName=groupUserVo.getUserName();
-            if(groupName!=null && !"".equals(groupName) && groupPerson!=null && !"".equals(groupPerson)){
+            if(group.getGroupName()!=null && !"".equals(group.getGroupName()) && group.getGroupPerson()!=null && !"".equals(group.getGroupPerson())){
                 if(userName!=null && !"".equals(userName)){
-                    Group group1=groupRepository.findByGroupName(groupName);
+                    Group group1=groupRepository.findByGroupName(group.getGroupName());
                     if(group1==null){
-                        Group group=new Group();
-                        group.setGroupName(groupName);
-                        group.setGroupPerson(groupPerson);
-                        groupRepository.save(group);
+                        User user1 = userRepository.findByUserName(group.getGroupPerson());
+                        if(user1 == null){
+                            msg.setMsg("指定人不存在，请在用户管理中添加");
+                            return msg;
+                        }
+                        Group group2=new Group();
+                        group2.setGroupName(group.getGroupName());
+                        group2.setGroupPerson(group.getGroupPerson());
+                        groupRepository.save(group2);
                         for(int i=0;i<userName.length;i++){
                             User user = userRepository.findByUserName(userName[i]);
                             if(user!=null){
@@ -82,13 +92,14 @@ public class GroupServiceImpl implements GroupService {
             }
         }catch (Exception e){
             msg.setMsg("添加失败"+e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
 
     //删除分组
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg deleteGroup(Long groupId) {
         Msg msg = new Msg(false, "删除失败");
         try {
@@ -103,25 +114,34 @@ public class GroupServiceImpl implements GroupService {
             msg.setMsg("删除成功");
         }catch (Exception e){
             msg.setMsg("删除失败"+e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg updateGroup(Long groupId, GroupUserVo groupUserVo) {
         Msg msg = new Msg(false, "修改失败");
         try {
-            String groupName=groupUserVo.getGroup().getGroupName();//域用户
-            String groupPerson=groupUserVo.getGroup().getGroupPerson();//指定人
+            Group group=groupUserVo.getGroup();
+            if(group == null){
+                msg.setMsg("分组名和指定人不能为空");
+                return msg;
+            }
             String[] userName=groupUserVo.getUserName();//分组成员
             Long groupId2=groupUserVo.getGroup().getGroupId();//分组id
-            if(groupName!=null && !"".equals(groupName) && groupPerson!=null && !"".equals(groupPerson)){
+            if(group.getGroupName()!=null && !"".equals(group.getGroupName()) && group.getGroupPerson()!=null && !"".equals(group.getGroupPerson())){
                 if(userName!=null && !"".equals(userName)) {
-                    Group group1 = groupRepository.findByGroupName(groupName);
+                    Group group1 = groupRepository.findByGroupName(group.getGroupName());
                     if (group1 == null || group1.getGroupId() == groupId) {
-                        Group group=groupUserVo.getGroup();
-                        groupRepository.save(group);
+                        User user1 = userRepository.findByUserName(group.getGroupPerson());
+                        if(user1 == null){
+                            msg.setMsg("指定人不存在，请在用户管理中添加");
+                            return msg;
+                        }
+                        Group group2=groupUserVo.getGroup();
+                        groupRepository.save(group2);
                         List<GroupUser> groupUserList=groupUserRepository.findByGroupId(groupId2);
                         if(groupUserList.size()>0){
                             groupUserRepository.deleteByGroupId(groupId2);
@@ -151,6 +171,7 @@ public class GroupServiceImpl implements GroupService {
             }
         }catch (Exception e){
             msg.setMsg("修改失败"+e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }

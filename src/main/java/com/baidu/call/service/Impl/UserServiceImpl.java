@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
 
     //删除用户
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg deleteUser(Long userId) {
         Msg msg = new Msg(false, "删除失败");
         try {
@@ -160,13 +160,14 @@ public class UserServiceImpl implements UserService {
             msg.setMsg("删除成功");
         } catch (Exception e) {
             msg.setMsg("删除失败" + e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }
 
     //修改用户
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED)
     public Msg updateUser(Long userId, UserAreaVo userAreaVo) {
         Msg msg = new Msg(false, "修改失败");
         try {
@@ -231,6 +232,7 @@ public class UserServiceImpl implements UserService {
             }
         } catch (Exception e) {
             msg.setMsg("修改失败" + e);
+            AbstractTransactionAspect.currentTransactionStatus().setRollbackOnly();
         }
         return msg;
     }

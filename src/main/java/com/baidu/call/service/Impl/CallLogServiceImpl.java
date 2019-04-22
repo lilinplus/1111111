@@ -87,7 +87,9 @@ public class CallLogServiceImpl implements CallLogService {
                 if (i == 0) {
                     sql = sql + " and ";
                 }
-                sql = sql + " unix_timestamp(start_time)*1000 >= " + starttime + " and unix_timestamp(end_time)*1000 <= " + endtime + " and call_src = " + phoneName;
+                sql = sql + " unix_timestamp(start_time)*1000 >= " + starttime +
+                        " and unix_timestamp(end_time)*1000 <= " + endtime +
+                        " and call_src = " + phoneName +" and recording_filename != \"\" ";
 
                 if(parameters != null){
                     if (parameters.containsKey("startTime") && parameters.get("startTime") != null) {
@@ -118,20 +120,6 @@ public class CallLogServiceImpl implements CallLogService {
                 }
             }
 
-//            if (parameters != null) {
-//                Set<String> set = parameters.keySet();
-//                for (String key : set) {
-//                    PropertyFieldConvertor pfc=new PropertyFieldConvertor();
-//                    String str = pfc.propertyToField(key);
-//                    if(str.startsWith("start")){
-//                        sql = sql + " and " + str + " >= "+parameters.get(key);
-//                    }else if(str.startsWith("end")){
-//                        sql = sql + " and " + str + " <= "+parameters.get(key);
-//                    }else {
-//                        sql = sql + " and " + str + " like '%"+ parameters.get(key)+"%'";
-//                    }
-//                }
-//            }
             List retVal1 = commonService.findInfoByNativeSQL(sql);
             if (orderBy != null) {
                 sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
@@ -173,73 +161,6 @@ public class CallLogServiceImpl implements CallLogService {
         }
         return pager;
     }
-
-//    //查询用户录音信息
-//    @Override
-//    public Pager queryUserCallLog(Pager pager, String userName) {
-//        Integer page = pager.getNowPage();
-//        Integer size = pager.getPageSize();
-//        Map<String, Object> parameters = pager.getParameters();
-//        List<Sort> orderBy = pager.getAdvanceQuerySorts();
-//        try {
-//            if (userName == null) {
-//                return pager;
-//            }
-//            User user = userRepository.findByUserName(userName);
-//            if (user == null) {
-//                return pager;
-//            }
-//
-//            String sql = "SELECT * FROM t_call_log WHERE 1=1 ";
-//            List<PhoneUser> phoneUserList = phoneUserRepository.findByUserName(user.getUserName());
-//            for (int i = 0; i < phoneUserList.size(); i++) {
-//                Long starttime = phoneUserList.get(i).getPhoneStarttime();
-//                Long endtime = phoneUserList.get(i).getPhoneEndtime();
-//                String phoneName = phoneUserList.get(i).getPhoneName();
-//                if (i == 0) {
-//                    sql = sql + " and ";
-//                }
-//                sql = sql + " unix_timestamp(start_time)>= " + starttime + " and unix_timestamp(end_time)<= " + endtime + " and call_src = " + phoneName;
-//                if (phoneUserList.size() - i > 1) {
-//                    sql = sql + " or ";
-//                }
-//            }
-//
-//            if (parameters != null) {
-//                Set<String> set = parameters.keySet();
-//                for (String key : set) {
-//                    sql = sql + " and " + propertyToField(key) + " like '%" + parameters.get(key) + "%'";
-//                }
-//            }
-//            if (orderBy != null) {
-//                sql = sql + " order by " + propertyToField(orderBy.get(0).getField()) + " " + orderBy.get(0).getLogic();
-//            }
-//            if ((size != null && size != 0) && (page != null && page != 0)) {
-//                sql = sql + " limit " + (page - 1) * size + "," + size;
-//            } else {
-//                page = 1;
-//                size = 10;
-//                sql = sql + " limit 0,10";
-//            }
-//            List retVal = commonService.findInfoByNativeSQL(sql);
-//            int pageCount = 0;//总页数
-//            int recordCount = retVal.size();//总记录数
-//            if (recordCount % size == 0) {
-//                pageCount = recordCount / size;
-//            } else {
-//                pageCount = recordCount / size + 1;
-//            }
-//            pager.setExhibitDatas(retVal);
-//            pager.setPageSize(size);
-//            pager.setNowPage(page);
-//            pager.setPageCount(pageCount);
-//            pager.setRecordCount(recordCount);
-//            logger.info(sql);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return pager;
-//    }
 
     //查询当前用户负责的区域
     @Override

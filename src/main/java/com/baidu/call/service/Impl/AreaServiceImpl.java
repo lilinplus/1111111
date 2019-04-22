@@ -95,6 +95,11 @@ public class AreaServiceImpl implements AreaService {
                 msg.setMsg("信息不存在");
                 return msg;
             }
+            List<User> userList = userRepository.findByUserAreaId(areaId);
+            if(userList.size() > 0){
+                msg.setMsg("区域有引用，不能删除");
+                return msg;
+            }
             userAreaRepository.deleteByAreaId(areaId);
             areaRepository.deleteById(areaId);
             msg.setSuccess(true);

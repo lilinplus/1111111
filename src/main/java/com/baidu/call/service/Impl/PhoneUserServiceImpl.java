@@ -1,7 +1,9 @@
 package com.baidu.call.service.Impl;
 
 import com.baidu.call.model.PhoneUser;
+import com.baidu.call.model.User;
 import com.baidu.call.repository.PhoneUserRepository;
+import com.baidu.call.repository.UserRepository;
 import com.baidu.call.service.CommonService;
 import com.baidu.call.service.PhoneUserService;
 import com.baidu.call.utils.Msg;
@@ -29,17 +31,29 @@ public class PhoneUserServiceImpl implements PhoneUserService {
     @Autowired
     private PhoneUserRepository phoneUserRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     //添加用户使用话机的时间段
     @Override
     public Msg addPhoneUser(PhoneUser phoneUser) {
         Msg msg = new Msg(false,"添加失败");
         try {
             String userName=phoneUser.getUserName();
+            if(phoneUser.getPhoneName() == null){
+                msg.setMsg("话机名不能为空");
+                return msg;
+            }
             String phoneName=phoneUser.getPhoneName().trim();//话机名
             Long phoneStarttime=phoneUser.getPhoneStarttime();
             Long phoneEndtime=phoneUser.getPhoneEndtime();
             if(userName!=null && !"".equals(userName) && phoneName!=null && !"".equals(phoneName) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
                 if(phoneEndtime>phoneStarttime){
+                    User user = userRepository.findByUserName(userName);
+                    if(user == null){
+                        msg.setMsg("用户不存在，请在用户管理中添加");
+                        return msg;
+                    }
                     phoneUser.setPhoneName(phoneName);
                     phoneUserRepository.save(phoneUser);
                     msg.setSuccess(true);
@@ -95,9 +109,19 @@ public class PhoneUserServiceImpl implements PhoneUserService {
         Long phoneStarttime=phoneUser.getPhoneStarttime();
         Long phoneEndtime=phoneUser.getPhoneEndtime();
         if(userName!=null && !"".equals(userName) && phoneName!=null && !"".equals(phoneName) && phoneStarttime!=null && !"".equals(phoneStarttime) && phoneEndtime!=null && !"".equals(phoneEndtime)){
-            phoneUserRepository.save(phoneUser);
-            msg.setSuccess(true);
-            msg.setMsg("更新成功");
+            if(phoneEndtime>phoneStarttime){
+                User user = userRepository.findByUserName(userName);
+                if(user == null){
+                    msg.setMsg("用户不存在，请在用户管理中添加");
+                    return msg;
+                }
+                phoneUser.setPhoneName(phoneName);
+                phoneUserRepository.save(phoneUser);
+                msg.setSuccess(true);
+                msg.setMsg("更新成功");
+            }else {
+                msg.setMsg("结束时间不能早于开始时间!");
+            }
         }else {
             msg.setMsg("文本框不能为空");
         }

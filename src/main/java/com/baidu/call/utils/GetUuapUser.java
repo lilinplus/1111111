@@ -24,9 +24,9 @@ public class GetUuapUser {
             Assertion assertion = (Assertion) session.getAttribute("_const_cas_assertion_");
             logger.error("GetUuapUser --- uuap login info :" + assertion);
             if (assertion == null) {
-                  //username = readConfigByPath("///usr/local/call/LoginUser.properties", "username");
+//                username = readConfigByPath("///usr/local/call/LoginUser.properties", "username");
 //                username = readConfigByPath("D:\\dist\\LoginUser.properties", "username");
-                username = "v_gaochuang";
+                username = "zhuweidong";
 //                username = null;
             } else {
                 username = assertion.getPrincipal().getName();
