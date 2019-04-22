@@ -69,7 +69,7 @@ public class GroupServiceImpl implements GroupService {
                         for(int i=0;i<userName.length;i++){
                             User user = userRepository.findByUserName(userName[i]);
                             if(user!=null){
-                                Long groupId=group.getGroupId();
+                                Long groupId=group2.getGroupId();
                                 GroupUser groupUser=new GroupUser();
                                 groupUser.setGroupId(groupId);
                                 groupUser.setUserName(userName[i]);
