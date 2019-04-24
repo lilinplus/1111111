@@ -114,7 +114,7 @@ public class CallLogController {
             String fileName = filePathName.split("/")[filePathName.split("/").length - 1].toString();
             File file = new File(filePathName);
             if (!file.exists()) {
-                msg.setMsg("文件路径不存在");
+                msg.setMsg("文件不存在");
                 return msg;
             }
             response.reset();
