@@ -40,14 +40,14 @@ public class PhoneUserServiceImpl implements PhoneUserService {
         Msg msg = new Msg(false, "添加失败");
         try {
             String userName = phoneUser.getUserName();
-            if (phoneUser.getPhoneName() == null) {
+            if (phoneUser.getPhoneName() == null || "".equals(phoneUser.getPhoneName())) {
                 msg.setMsg("话机名不能为空");
                 return msg;
             }
             String phoneName = phoneUser.getPhoneName().trim();//话机名
             Long phoneStarttime = phoneUser.getPhoneStarttime();
             Long phoneEndtime = phoneUser.getPhoneEndtime();
-            if (userName != null && !"".equals(userName) && phoneName != null && !"".equals(phoneName) && phoneStarttime != null && !"".equals(phoneStarttime) && phoneEndtime != null && !"".equals(phoneEndtime)) {
+            if (userName != null && !"".equals(userName)) {
                 if (phoneStarttime != 0 && phoneEndtime != 0) {
                     if (phoneEndtime > phoneStarttime) {
                         User user = userRepository.findByUserName(userName);
@@ -66,7 +66,7 @@ public class PhoneUserServiceImpl implements PhoneUserService {
                     msg.setMsg("开始时间和结束时间不能为空");
                 }
             } else {
-                msg.setMsg("话机名和域用户不能为空");
+                msg.setMsg("域用户不能为空");
             }
         } catch (Exception e) {
             msg.setMsg("添加失败" + e);

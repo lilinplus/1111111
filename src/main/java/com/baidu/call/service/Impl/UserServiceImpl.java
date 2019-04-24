@@ -10,8 +10,6 @@ import com.baidu.call.service.UserService;
 import com.baidu.call.utils.GetUuapUser;
 import com.baidu.call.utils.Msg;
 import com.baidu.call.utils.page.dtgrid.Pager;
-import com.baidu.uic.ws.dto.UserDTO;
-import com.baidu.uic.ws.interfaces.IUserRemoteService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.aspectj.AbstractTransactionAspect;
-import org.w3c.dom.ls.LSInput;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -49,9 +46,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private GroupUserRepository groupUserRepository;
 
-    @Autowired
-    private IUserRemoteService uicUserRemoteService;
-
     //添加用户
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -61,11 +55,6 @@ public class UserServiceImpl implements UserService {
             String userName = userAreaVo.getUser().getUserName();//域用户
             String role = userAreaVo.getUser().getUserRole();//角色名
             Long areaId = userAreaVo.getUser().getUserAreaId();//所在区域Id
-            UserDTO userDTO = uicUserRemoteService.getUserByUsername(userName);
-            if (userDTO == null) {
-                msg.setMsg("域用户不存在!");
-                return msg;
-            }
             if (userName != null && !"".equals(userName) && role != null && !"".equals(role)) {
                 if (areaId != null && !"".equals(areaId)) {
                     if ("普通用户".equals(userAreaVo.getUser().getUserRole())) {
