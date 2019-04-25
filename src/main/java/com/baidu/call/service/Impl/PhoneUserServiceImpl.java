@@ -45,6 +45,10 @@ public class PhoneUserServiceImpl implements PhoneUserService {
                 return msg;
             }
             String phoneName = phoneUser.getPhoneName().trim();//话机名
+            if(phoneName == null || "".equals(phoneName)){
+                msg.setMsg("话机名不能为空");
+                return msg;
+            }
             Long phoneStarttime = phoneUser.getPhoneStarttime();
             Long phoneEndtime = phoneUser.getPhoneEndtime();
             if (userName != null && !"".equals(userName)) {
@@ -109,25 +113,37 @@ public class PhoneUserServiceImpl implements PhoneUserService {
             return msg;
         }
         String userName = phoneUser.getUserName();
-        String phoneName = phoneUser.getPhoneName();
+        if (phoneUser.getPhoneName() == null || "".equals(phoneUser.getPhoneName())) {
+            msg.setMsg("话机名不能为空");
+            return msg;
+        }
+        String phoneName = phoneUser.getPhoneName().trim();//话机名
+        if(phoneName == null || "".equals(phoneName)){
+            msg.setMsg("话机名不能为空");
+            return msg;
+        }
         Long phoneStarttime = phoneUser.getPhoneStarttime();
         Long phoneEndtime = phoneUser.getPhoneEndtime();
-        if (userName != null && !"".equals(userName) && phoneName != null && !"".equals(phoneName) && phoneStarttime != null && !"".equals(phoneStarttime) && phoneEndtime != null && !"".equals(phoneEndtime)) {
-            if (phoneEndtime > phoneStarttime) {
-                User user = userRepository.findByUserName(userName);
-                if (user == null) {
-                    msg.setMsg("用户不存在，请在用户管理中添加");
-                    return msg;
+        if (userName != null && !"".equals(userName)) {
+            if(phoneStarttime != 0 && phoneEndtime != 0){
+                if (phoneEndtime > phoneStarttime) {
+                    User user = userRepository.findByUserName(userName);
+                    if (user == null) {
+                        msg.setMsg("用户不存在，请在用户管理中添加");
+                        return msg;
+                    }
+                    phoneUser.setPhoneName(phoneName);
+                    phoneUserRepository.save(phoneUser);
+                    msg.setSuccess(true);
+                    msg.setMsg("更新成功");
+                } else {
+                    msg.setMsg("结束时间不能早于开始时间!");
                 }
-                phoneUser.setPhoneName(phoneName);
-                phoneUserRepository.save(phoneUser);
-                msg.setSuccess(true);
-                msg.setMsg("更新成功");
-            } else {
-                msg.setMsg("结束时间不能早于开始时间!");
+            }else {
+                msg.setMsg("开始时间和结束时间不能为空");
             }
         } else {
-            msg.setMsg("文本框不能为空");
+            msg.setMsg("域用户不能为空");
         }
         return msg;
     }
