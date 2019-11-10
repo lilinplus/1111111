@@ -11,9 +11,9 @@ public class Encryptor {
         String name = textEncryptor.encrypt("root");
         String password = textEncryptor.encrypt("123456");
 //解密内容
-//        String url = textEncryptor.decrypt("");
-//        String name = textEncryptor.decrypt("");
-//        String password = textEncryptor.decrypt("4EyN0xDLbnP2lsaayjl8fbIctj5bVIdD");
+        String url1 = textEncryptor.decrypt("");
+        String name1 = textEncryptor.decrypt("");
+        String password1 = textEncryptor.decrypt("4EyN0xDLbnP2lsaayjl8fbIctj5bVIdD");
 
 
         System.out.println(url);
