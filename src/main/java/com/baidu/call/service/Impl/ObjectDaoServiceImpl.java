@@ -17,7 +17,7 @@ public class ObjectDaoServiceImpl implements ObjectDaoService {
     private EntityManager entityManager;
 
     @Override
-    public EntityManager getEntityManager(){
+    public EntityManager getEntityManager() {
         return this.entityManager;
     }
 

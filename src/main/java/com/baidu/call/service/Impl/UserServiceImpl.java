@@ -240,7 +240,7 @@ public class UserServiceImpl implements UserService {
             if (parameters != null) {
                 Set<String> set = parameters.keySet();
                 for (String key : set) {
-                    System.out.println(key + ":" + parameters.get(key));
+                    //System.out.println(key + ":" + parameters.get(key));
                     sql = sql + " and " + propertyToField(key) + " like '%" + parameters.get(key) + "%'";
                 }
             }

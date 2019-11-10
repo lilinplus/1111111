@@ -6,9 +6,9 @@ spring:
   profiles: dev
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://172.16.207.133:8006/zycoo_coovox?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=UTF8
-    username: test
-    password: test
+    url: jdbc:mysql://localhost:3306/zycoo_coovox?createDatabaseIfNotExist=true&amp;useUnicode=true&amp;characterEncoding=utf-8;
+    username: root
+    password:
     driver-class-name: com.mysql.jdbc.Driver
 # 下面为连接池的补充设置，应用到上面所有数据源中
 # 初始化大小，最小，最大

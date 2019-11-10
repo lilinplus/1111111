@@ -17,7 +17,7 @@ public class PhoneUser {
     private Long phoneUserId;//id
 
     @Column(name = "user_name")
-    @Size(max = 50,message = "长度不得超过50")
+    @Size(max = 50, message = "长度不得超过50")
     @ApiModelProperty(value = "域用户名")
     private String userName;//域用户名
 
