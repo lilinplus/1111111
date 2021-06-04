@@ -133,7 +133,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>4.5.13</version>
         </dependency>
 
         <!-- lombok项目的产生就是为了省去我们手动创建getter和setter方法的麻烦 -->
