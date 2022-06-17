@@ -103,7 +103,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.28</version>
+            <version>1.2.83</version>
         </dependency>
 
         <!--&lt;!&ndash;没有这个会报错，不知道原因 模板引擎 可以应用在任何需要格式化数据显示的Java程序中-->
